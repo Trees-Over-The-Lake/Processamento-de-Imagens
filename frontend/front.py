@@ -24,7 +24,6 @@ def drawGUI(current_working_dir, supported_types):
             image_path = values['-FILE_PATH-']
             
             print("Imagem carregada:", image_path)
-            
             showImage(image_path)
 
     window.close()

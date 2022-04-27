@@ -1,4 +1,4 @@
-from skimage import data, io
+from skimage import io
 from matplotlib import pyplot as plt
 
 # Showing image to the user
