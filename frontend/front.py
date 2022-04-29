@@ -5,6 +5,7 @@ from frontend.image import *
 # Add a touch of color
 sg.theme('DarkAmber')  
 
+# Drawing the GUI
 def drawGUI(current_working_dir, supported_types):
     # All the stuff inside your window.
     layout = [  [sg.Text('Aplicativo de detecção de tumores em mamografias')],
@@ -13,7 +14,7 @@ def drawGUI(current_working_dir, supported_types):
                 [sg.Button('Ok')] ]
 
     # Create the Window
-    window = sg.Window('Mamografias ', layout)
+    window = sg.Window('Mamografias ', layout, resizable=True)
 
     # Event Loop to process "events" and get the "values" of the inputs
     while True:
