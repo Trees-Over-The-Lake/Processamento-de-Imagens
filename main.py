@@ -7,4 +7,5 @@ cwd = backos.getCurrentWorkingDirectory()
 # JPEG and PNG types
 types = [('Images', '*.jpeg *.png *.jpg')]
 
-front.drawGUI(cwd, types)
+gui = front.GUI(cwd)
+gui.drawGUI()
