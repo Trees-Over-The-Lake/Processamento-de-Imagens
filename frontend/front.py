@@ -57,7 +57,7 @@ class GUI:
         # Elementos da tela de predição
         layout = [
                     [sg.Text('Tela para fazer predição de uma imagem')],
-                    [sg.Button('Fazer predição')],
+                    [sg.Button('Fazer predição'), sg.Button('Voltar a tela anterior')],
                 ]
         
         window = sg.Window('Predição das Mamografias', layout, resizable=False, font=('Helvetica', 16))
@@ -67,6 +67,10 @@ class GUI:
             
             if event == sg.WIN_CLOSED: 
                 self.loop = False
+                break
+                
+            elif event == 'Voltar a tela anterior':
+                window.close()
                 break
             
             print(values)
