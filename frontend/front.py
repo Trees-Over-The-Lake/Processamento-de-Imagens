@@ -1,3 +1,4 @@
+import concurrent.futures
 import PySimpleGUI as sg
 
 from frontend.image import *
@@ -46,9 +47,10 @@ class GUI:
                 train_size   = int(values['-PORCENTAGEM_TREINAMENTO-'])
                 
                 print("Pasta carregada:", image_folder)
-                sg.Popup(classifier.runPrediction(train_size, image_folder, grey_colors),
-                        title='Resultado Treinamento', font=('Helvetica', 16))
                 
+                accuracy, especificidade = classifier.runPrediction(train_size, image_folder, grey_colors)
+                sg.Popup(f"Acurácia: {accuracy}", image='./metricas.png', title='Resultado Treinamento', font=('Helvetica', 16))
+                    
                 break
 
         window.close()
@@ -58,7 +60,7 @@ class GUI:
         layout = [
                     [sg.Text('Tela para fazer predição de uma imagem')],
                     [sg.Button('Fazer predição'), sg.Button('Voltar a tela anterior')],
-                ]
+                 ]
         
         window = sg.Window('Predição das Mamografias', layout, resizable=False, font=('Helvetica', 16))
         

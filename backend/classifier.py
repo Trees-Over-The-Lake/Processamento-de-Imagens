@@ -1,13 +1,15 @@
 import os
 import string
 import numpy as np
-import sklearn.metrics
 
+import sklearn.metrics
 from skimage.feature import graycomatrix, graycoprops
 from skimage import io
 from sklearn import svm
 from skimage.measure import shannon_entropy
 from sklearn.model_selection import train_test_split
+
+from matplotlib import pyplot as plt
 
 from PIL import Image
 
@@ -68,7 +70,22 @@ def runPrediction(train_size: int, image_dir: string, grey_colors: int):
 
     prediction = clf.predict(test)
     
-    return sklearn.metrics.accuracy_score(test_answers, prediction)
+    accuracy = sklearn.metrics.accuracy_score(test_answers, prediction)
+    confusion_matrix = sklearn.metrics.confusion_matrix(test_answers, prediction)
+
+    especificidade = 0
+
+    print(f"Accuracy = {accuracy}")
+    print(f"Matriz de confusão = {confusion_matrix}")
+
+    plt.matshow(confusion_matrix, fignum="int")
+
+    for (i, j), z in np.ndenumerate(confusion_matrix):
+        plt.text(j, i, '{:0.1f}'.format(z), ha='center', va='center',
+                bbox=dict(boxstyle='round', facecolor='white', edgecolor='0.3'))
+
+    plt.savefig(f"./metricas.png")
+    return accuracy, especificidade
 
 def runPredictionOneImage(train_size: int, images_path: string, grey_colors: int):
     image       =  np.asarray(Image.open(f"{image_dir}/{density_class}/{i}").quantize(grey_colors))
