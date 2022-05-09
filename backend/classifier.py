@@ -35,13 +35,16 @@ def split_train_test(train_size: int, image_dir: string, grey_colors: int):
 
             image       =  np.asarray(Image.open(f"{image_dir}/{density_class}/{i}").quantize(grey_colors))
             
-            glcm        =  graycomatrix(image, [1, 2, 4, 8, 16], [0, np.pi/8, np.pi/4, 3*np.pi/8, np.pi/2, 5*np.pi/8, 3*np.pi/4, 7*np.pi/8])
-            energy      =  graycoprops(glcm, 'energy')
-            homogeneity =  graycoprops(glcm, 'homogeneity')
-            asm         =  graycoprops(glcm, 'ASM')
-            entropy     =  shannon_entropy(glcm, base=2)
+            glcm          =  graycomatrix(image, [1, 2, 4, 8, 16], [0, np.pi/8, np.pi/4, 3*np.pi/8, np.pi/2, 5*np.pi/8, 3*np.pi/4, 7*np.pi/8], levels=grey_colors)
+            energy        =  graycoprops(glcm, 'energy')
+            homogeneity   =  graycoprops(glcm, 'homogeneity')
+            asm           =  graycoprops(glcm, 'ASM')
+            dissimilarity =  graycoprops(glcm, 'dissimilarity')
+            correlation   =  graycoprops(glcm, 'correlation')
+            contrast      =  graycoprops(glcm, 'contrast')
+            entropy       =  shannon_entropy(glcm, base=2)
 
-            tmp = np.concatenate((energy, homogeneity, entropy), axis=None)
+            tmp = np.concatenate((energy, homogeneity, entropy, asm, dissimilarity, correlation, contrast), axis=None)
 
             train.append(tmp)
             train_answers.append(f"{density_class}")
@@ -49,13 +52,16 @@ def split_train_test(train_size: int, image_dir: string, grey_colors: int):
         for i in tmp_test:
             image       =  np.asarray(Image.open(f"{image_dir}/{density_class}/{i}").quantize(grey_colors))
 
-            glcm        =  graycomatrix(image, [1, 2, 4, 8, 16], [0, np.pi/8, np.pi/4, 3*np.pi/8, np.pi/2, 5*np.pi/8, 3*np.pi/4, 7*np.pi/8])
-            energy      =  graycoprops(glcm, 'energy')
-            homogeneity =  graycoprops(glcm, 'homogeneity')
-            asm         =  graycoprops(glcm, 'ASM')
-            entropy     =  shannon_entropy(glcm, base=2)
+            glcm          =  graycomatrix(image, [1, 2, 4, 8, 16], [0, np.pi/8, np.pi/4, 3*np.pi/8, np.pi/2, 5*np.pi/8, 3*np.pi/4, 7*np.pi/8], levels=grey_colors)
+            energy        =  graycoprops(glcm, 'energy')
+            homogeneity   =  graycoprops(glcm, 'homogeneity')
+            asm           =  graycoprops(glcm, 'ASM')
+            dissimilarity =  graycoprops(glcm, 'dissimilarity')
+            correlation   =  graycoprops(glcm, 'correlation')
+            contrast      =  graycoprops(glcm, 'contrast')
+            entropy       =  shannon_entropy(glcm, base=2)
             
-            tmp = np.concatenate((energy, homogeneity, entropy), axis=None)
+            tmp = np.concatenate((energy, homogeneity, entropy, asm, dissimilarity, correlation, contrast), axis=None)
 
             test.append(tmp)
             test_answers.append(f"{density_class}")
