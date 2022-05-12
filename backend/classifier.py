@@ -59,6 +59,7 @@ class ImageClassifier:
     # Angulos para calcular matriz de co-ocorrencia
     __angles_glcm: np.empty(0, dtype=np.float64)
 
+
     def __init__(self):
         self.__model_kernel = "linear"
         self.__model = svm.SVC(kernel=self.__model_kernel, C=1.15)
@@ -98,6 +99,7 @@ class ImageClassifier:
             3*np.pi/4, 
             7*np.pi/8
         ])
+
 
     # Gets e Sets :)
     def set_model_kernel(self, k: str):
@@ -191,14 +193,16 @@ class ImageClassifier:
         for density_class in density_classes:
             path_images = [f for f in os.listdir(f"{self.get_images_dir()}/{density_class}") if f.endswith(tuple(self.get_supported_img_extensions()))]
             
-            tmp_train, tmp_test = train_test_split(path_images, train_size=self.__percentage_train, shuffle=True)
+            tmp_train, tmp_test = train_test_split(path_images, train_size=self.get_percentage_train(), shuffle=True)
 
             # Para cada imagem no conjunto de treino, extrair os descritores de textura abaixo e concatená-los
             # ao conjunto de treino
             for i in tmp_train:
                 image =  Image.open(f"{self.get_images_dir()}/{density_class}/{i}")
 
-                #image = image.filter(ImageFilter.GaussianBlur(radius=self.get_gaussian_radius()))
+                # Pré-processamento com suavização gaussiana e filtros para alterar sharpness,
+                # contraste, cor e brilho
+                image = image.filter(ImageFilter.GaussianBlur(radius=self.get_gaussian_radius()))
 
                 enhancer_sharpness = ImageEnhance.Sharpness(image)
                 image = enhancer_sharpness.enhance(self.get_sharpness_boost_strength())
@@ -212,9 +216,8 @@ class ImageClassifier:
                 enhancer_brightness = ImageEnhance.Brightness(image)
                 image= enhancer_brightness.enhance(self.get_brightness_boost_strength())
 
+                # Reamostragem dos tons de cinza
                 image = image.quantize(self.get_n_colors())
-                
-                # Pré-processamento dos dados
 
                 # Gerando matriz de co-ocorrência
                 glcm          =  graycomatrix(image, self.__distances_glcm, self.__angles_glcm, levels=self.get_n_colors())
