@@ -11,7 +11,7 @@ from sklearn.model_selection import train_test_split
 
 from matplotlib import pyplot as plt
 
-from PIL import Image
+from PIL import Image, ImageFilter, ImageEnhance
 
 
 class ImageClassifier:
@@ -22,18 +22,13 @@ class ImageClassifier:
     __model_kernel: str
 
     ## Arrays com os conjuntos de treino e teste, bem como as respostas
-    '''
+    
     __images_train:  np.empty(0, dtype=np.float64)
-    __answers_train: np.empty(0, dtype=np.float64)
     __images_test:   np.empty(0, dtype=np.float64)
-    __answers_test:  np.empty(0, dtype=np.float64)
     __predictions:   np.empty(0, dtype=np.float64)
-    '''
-    __images_train:  list
-    __answers_train: list
-    __images_test:   list
-    __answers_test:  list
-    __predictions:   list
+    __answers_train: np.empty(0, dtype=np.int32)
+    __answers_test:  np.empty(0, dtype=np.int32)
+    
     # Diretorio onde estão as pastas de classes BIRADS
     __images_dir: str
 
@@ -48,7 +43,7 @@ class ImageClassifier:
     __n_colors: float
     
     # Raio da matriz de suavização gaussiana. 0 desabilita
-    __gaussian_strength: int
+    __gaussian_radius: int
     
     # Em quanto cada um desses elementos será realçado
     # no pré-processamento. 1 os mantém igual, valores de 0 a 1
@@ -56,6 +51,7 @@ class ImageClassifier:
     __sharpness_boost_strength:  float
     __contrast_boost_strength :  float
     __brightness_boost_strength: float
+    __color_boost_strength:      float
 
     # Distancias na matriz de co-ocorrencia
     __distances_glcm: np.empty(0, dtype=np.int32)
@@ -65,30 +61,23 @@ class ImageClassifier:
 
     def __init__(self):
         self.__model_kernel = "linear"
-        self.__model = svm.SVC(kernel=self.__model_kernel)
-
-        '''
+        self.__model = svm.SVC(kernel=self.__model_kernel, C=1.15)
+        
         self.__images_train  = np.empty(0, dtype=np.float64)
-        self.__answers_train = np.empty(0, dtype=np.float64)
         self.__images_test   = np.empty(0, dtype=np.float64)
-        self.__answers_test  = np.empty(0, dtype=np.float64)
         self.__predictions   = np.empty(0, dtype=np.float64)
-        '''
-
-        self.__images_train  = []
-        self.__answers_train = []
-        self.__images_test   = []
-        self.__answers_test  = []
-        self.__predictions   = []
-
+        self.__answers_train = np.empty(0, dtype=np.int32)
+        self.__answers_test  = np.empty(0, dtype=np.int32)
+        
         self.__supported_img_extensions = ['.jpg', '.jpeg', '.png']
 
-        # Valores default. Podem ser escolhidos outros pela interface e pelo metodo set :)
+        # Valores default. Outros valores podem ser escolhidos pela interface e pelo metodo set :)
         self.__n_colors = 32
-        self.__gaussian_strength = 1
+        self.__gaussian_radius = 0
         self.__sharpness_boost_strength  = 1
         self.__contrast_boost_strength   = 1
         self.__brightness_boost_strength = 1
+        self.__color_boost_strength      = 1
         self.__percentage_train = 75
 
         self.__distances_glcm = np.array([
@@ -111,7 +100,6 @@ class ImageClassifier:
         ])
 
     # Gets e Sets :)
-
     def set_model_kernel(self, k: str):
         self.__model_kernel = k
     
@@ -124,11 +112,11 @@ class ImageClassifier:
     def get_n_colors(self):
         return self.__n_colors
 
-    def set_gaussian_strength(self, strength: int):
-        self.__gaussian_strength = strength
+    def set_gaussian_radius(self, strength: int):
+        self.__gaussian_radius = strength
     
-    def get_gaussian_strength(self):
-        return self.__gaussian_strength
+    def get_gaussian_radius(self):
+        return self.__gaussian_radius
     
     def set_sharpness_boost_strength(self, strength: float):
         self.__sharpness_boost_strength = strength
@@ -147,6 +135,12 @@ class ImageClassifier:
     
     def get_brightness_boost_strength(self):
         return self.__brightness_boost_strength
+
+    def set_color_boost_strength(self, strength: float):
+        self.__color_boost_strength = strength
+    
+    def get_color_boost_strength(self):
+        return self.__color_boost_strength
 
     def set_percentage_train(self, percentage: int):
         self.__percentage_train = percentage
@@ -179,11 +173,20 @@ class ImageClassifier:
         return self.__predictions
 
     '''
-    Returns two sets containing the training and testing sets, respectively
-    @param train_size: an int from 1 to 99 indicating how much of the available
-    data will be used for training
+    Essa função separa as imagens encontradas nas pastas de acordo com self.__percentage_train, com 
+    balanceamento equilibrado entre as 4 classes.
     '''
     def split_train_test(self):
+        
+        '''
+        Infelizmente não há como saber quantos elementos os arrays vão ocupar de antemão,
+        e isso impossibilita usar arrays numpy para armazenar diretamente os dados resultados.
+        Os conjuntos de teste e treino são armazenados aqui temporariamente e no fim da execução
+        são convertidos para arrays numpy de volta.
+        '''
+        tmp_train_set = []
+        tmp_test_set  = []
+
         density_classes = ["1", "2", "3", "4"]
         for density_class in density_classes:
             path_images = [f for f in os.listdir(f"{self.get_images_dir()}/{density_class}") if f.endswith(tuple(self.get_supported_img_extensions()))]
@@ -193,9 +196,30 @@ class ImageClassifier:
             # Para cada imagem no conjunto de treino, extrair os descritores de textura abaixo e concatená-los
             # ao conjunto de treino
             for i in tmp_train:
-                image         =  np.asarray(Image.open(f"{self.get_images_dir()}/{density_class}/{i}").quantize(self.get_n_colors()))
+                image =  Image.open(f"{self.get_images_dir()}/{density_class}/{i}")
+
+                #image = image.filter(ImageFilter.GaussianBlur(radius=self.get_gaussian_radius()))
+
+                enhancer_sharpness = ImageEnhance.Sharpness(image)
+                image = enhancer_sharpness.enhance(self.get_sharpness_boost_strength())
+
+                enhancer_contrast = ImageEnhance.Contrast(image)
+                image = enhancer_contrast.enhance(self.get_contrast_boost_strength())
+
+                enhancer_color = ImageEnhance.Color(image)
+                image= enhancer_color.enhance(self.get_color_boost_strength())
+
+                enhancer_brightness = ImageEnhance.Brightness(image)
+                image= enhancer_brightness.enhance(self.get_brightness_boost_strength())
+
+                image = image.quantize(self.get_n_colors())
                 
+                # Pré-processamento dos dados
+
+                # Gerando matriz de co-ocorrência
                 glcm          =  graycomatrix(image, self.__distances_glcm, self.__angles_glcm, levels=self.get_n_colors())
+                
+                # Extraindo descritores de textura
                 energy        =  graycoprops(glcm, 'energy')
                 homogeneity   =  graycoprops(glcm, 'homogeneity')
                 asm           =  graycoprops(glcm, 'ASM')
@@ -203,16 +227,14 @@ class ImageClassifier:
                 correlation   =  graycoprops(glcm, 'correlation')
                 contrast      =  graycoprops(glcm, 'contrast')
                 entropy       =  shannon_entropy(glcm, base=2)
-                '''
+                
+                # Ajuntando todos em um array só
                 descriptors = np.concatenate((energy, homogeneity, entropy, asm, dissimilarity, correlation, contrast), axis=None)
+                
+                tmp_train_set.append(descriptors)
+                self.__answers_train = np.append(self.__answers_train, [density_class], axis=0)
 
-                self.__images_train  = np.append(self.__images_train, descriptors)
-                self.__answers_train = np.append(self.__answers_train, f"{density_class}")
-                '''
-
-                descriptors = np.concatenate((energy, homogeneity, entropy, asm, dissimilarity, correlation, contrast), axis=None)
-                self.__images_train.append(descriptors)
-                self.__answers_train.append(f"{density_class}")
+            
             # Mesma coisa que antes, só que concatenar ao conjunto de teste
             for i in tmp_test:
                 image         =  np.asarray(Image.open(f"{self.get_images_dir()}/{density_class}/{i}").quantize(self.get_n_colors()))
@@ -227,17 +249,18 @@ class ImageClassifier:
                 entropy       =  shannon_entropy(glcm, base=2)
                 
                 descriptors = np.concatenate((energy, homogeneity, entropy, asm, dissimilarity, correlation, contrast), axis=None)
-                self.__images_test.append(descriptors)
-                self.__answers_test.append(f"{density_class}")
 
-                '''
-                descriptors = np.concatenate((energy, homogeneity, entropy, asm, dissimilarity, correlation, contrast), axis=None)
+                tmp_test_set.append(descriptors)
+                self.__answers_test = np.append(self.__answers_test, [density_class], axis=0)
+                
+        # Transformando de volta para um array numpy
+        self.__images_train = np.asarray(tmp_train_set)
+        self.__images_test  = np.asarray(tmp_test_set)
 
-                self.__images_test  = np.append(self.__images_test, descriptors)
-                self.__answers_test = np.append(self.__answers_test, f"{density_class}")
-                '''
+
     def train_model(self):
         self.__model.fit(self.get_images_train(), self.get_answers_train())
+
 
     def predict_with_test_imgs(self):
         self.__predictions = self.__model.predict(self.get_images_test())
