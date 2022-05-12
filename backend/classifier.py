@@ -22,7 +22,6 @@ class ImageClassifier:
     __model_kernel: str
 
     ## Arrays com os conjuntos de treino e teste, bem como as respostas
-    
     __images_train:  np.empty(0, dtype=np.float64)
     __images_test:   np.empty(0, dtype=np.float64)
     __predictions:   np.empty(0, dtype=np.float64)
@@ -74,7 +73,7 @@ class ImageClassifier:
 
         # Valores default. Outros valores podem ser escolhidos pela interface e pelo metodo set :)
         self.__n_colors = 32
-        self.__gaussian_radius = 0
+        self.__gaussian_radius = 0.15
         self.__sharpness_boost_strength  = 1
         self.__contrast_boost_strength   = 1
         self.__brightness_boost_strength = 1
