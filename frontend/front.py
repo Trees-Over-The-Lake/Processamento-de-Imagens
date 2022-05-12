@@ -12,9 +12,8 @@ class GUI:
 
     # Draw the GUI and hold it, until the user ask to exit
     def drawGUI(self):
-        while self.loop:
-            self.drawTrainGUI()
-            self.drawPredictOneImage()
+        self.startScreen()
+        self.drawTrainGUI()
 
     # Drawing the drawTrainGUI
     def drawTrainGUI(self):
@@ -55,11 +54,12 @@ class GUI:
 
         window.close()
         
-    def drawPredictOneImage(self):
+    def startScreen(self):
         # Elementos da tela de predição
         layout = [
-                    [sg.Text('Tela para fazer predição de uma imagem')],
-                    [sg.Button('Fazer predição'), sg.Button('Voltar a tela anterior')],
+                    [sg.Text('Como funciona o trabalho?')],
+                    [sg.Button('funcionamento'), sg.Button('Opções avançadas')],
+                    [sg.Button('Iniciar')],
                  ]
         
         window = sg.Window('Predição das Mamografias', layout, resizable=False, font=('Helvetica', 16))
@@ -71,7 +71,12 @@ class GUI:
                 self.loop = False
                 break
                 
-            elif event == 'Voltar a tela anterior':
+            elif event == 'Iniciar':
+                window.close()
+                break
+            
+            elif event == 'Opções avançadas':
+                sg.popup_ok_cancel('Tem certeza que deseja configurar as opções avançadas?', title='Aviso', font=('Helvetica', 16))
                 window.close()
                 break
             
