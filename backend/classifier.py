@@ -13,93 +13,231 @@ from matplotlib import pyplot as plt
 
 from PIL import Image
 
-'''
-Returns two sets containing the training and testing sets, respectively
-@param train_size: an int from 1 to 99 indicating how much of the available
-data will be used for training
-'''
-def split_train_test(train_size: int, image_dir: string, grey_colors: int):
-    train = []
-    test  = []
-    train_answers = []
-    test_answers  = []
 
-    supported_extensions = ['.jpg', '.jpeg', '.png']
-
-    density_classes = ["1", "2", "3", "4"]
-    for density_class in density_classes:
-        path_images = [file for file in os.listdir(f"{image_dir}/{density_class}") if file.endswith(tuple(supported_extensions))]
-        tmp_train, tmp_test = train_test_split(path_images, train_size=train_size, shuffle=True)
-
-        for i in tmp_train:
-
-            image       =  np.asarray(Image.open(f"{image_dir}/{density_class}/{i}").quantize(grey_colors))
-            
-            glcm          =  graycomatrix(image, [1, 2, 4, 8, 16], [0, np.pi/8, np.pi/4, 3*np.pi/8, np.pi/2, 5*np.pi/8, 3*np.pi/4, 7*np.pi/8], levels=grey_colors)
-            energy        =  graycoprops(glcm, 'energy')
-            homogeneity   =  graycoprops(glcm, 'homogeneity')
-            asm           =  graycoprops(glcm, 'ASM')
-            dissimilarity =  graycoprops(glcm, 'dissimilarity')
-            correlation   =  graycoprops(glcm, 'correlation')
-            contrast      =  graycoprops(glcm, 'contrast')
-            entropy       =  shannon_entropy(glcm, base=2)
-
-            tmp = np.concatenate((energy, homogeneity, entropy, asm, dissimilarity, correlation, contrast), axis=None)
-
-            train.append(tmp)
-            train_answers.append(f"{density_class}")
-        
-        for i in tmp_test:
-            image       =  np.asarray(Image.open(f"{image_dir}/{density_class}/{i}").quantize(grey_colors))
-
-            glcm          =  graycomatrix(image, [1, 2, 4, 8, 16], [0, np.pi/8, np.pi/4, 3*np.pi/8, np.pi/2, 5*np.pi/8, 3*np.pi/4, 7*np.pi/8], levels=grey_colors)
-            energy        =  graycoprops(glcm, 'energy')
-            homogeneity   =  graycoprops(glcm, 'homogeneity')
-            asm           =  graycoprops(glcm, 'ASM')
-            dissimilarity =  graycoprops(glcm, 'dissimilarity')
-            correlation   =  graycoprops(glcm, 'correlation')
-            contrast      =  graycoprops(glcm, 'contrast')
-            entropy       =  shannon_entropy(glcm, base=2)
-            
-            tmp = np.concatenate((energy, homogeneity, entropy, asm, dissimilarity, correlation, contrast), axis=None)
-
-            test.append(tmp)
-            test_answers.append(f"{density_class}")
-
-    return train, test, train_answers, test_answers
-
-def runPrediction(train_size: int, image_dir: string, grey_colors: int):
-    train, test, train_answers, test_answers = split_train_test(train_size, image_dir, grey_colors)
-
-    clf = svm.SVC(kernel="linear")
-    clf.fit(train, train_answers)
-
-    prediction = clf.predict(test)
+class ImageClassifier:
+    # Modelo para previsões
+    __model: svm.SVC()
     
-    accuracy = sklearn.metrics.accuracy_score(test_answers, prediction)
-    confusion_matrix = sklearn.metrics.confusion_matrix(test_answers, prediction)
+    # Kernel do modelo
+    __model_kernel: str
 
-    especificidade = 0
+    ## Arrays com os conjuntos de treino e teste, bem como as respostas
+    '''
+    __images_train:  np.empty(0, dtype=np.float64)
+    __answers_train: np.empty(0, dtype=np.float64)
+    __images_test:   np.empty(0, dtype=np.float64)
+    __answers_test:  np.empty(0, dtype=np.float64)
+    __predictions:   np.empty(0, dtype=np.float64)
+    '''
+    __images_train:  list
+    __answers_train: list
+    __images_test:   list
+    __answers_test:  list
+    __predictions:   list
+    # Diretorio onde estão as pastas de classes BIRADS
+    __images_dir: str
 
-    print(f"Accuracy = {accuracy}")
-    print(f"Matriz de confusão = {confusion_matrix}")
+    # Tipos de arquivos
+    __supported_img_extensions: list
 
-    plt.matshow(confusion_matrix, fignum="int")
+    # Porcentagem de dados para treino. É balanceado igualmente entre
+    # as classses BIRADS
+    __percentage_train: int
 
-    for (i, j), z in np.ndenumerate(confusion_matrix):
-        plt.text(j, i, '{:0.1f}'.format(z), ha='center', va='center',
-                bbox=dict(boxstyle='round', facecolor='white', edgecolor='0.3'))
-
-    plt.savefig(f"./metricas.png")
-    return accuracy, especificidade
-
-def runPredictionOneImage(train_size: int, images_path: string, grey_colors: int):
-    image       =  np.asarray(Image.open(f"{image_dir}/{density_class}/{i}").quantize(grey_colors))
-
-    glcm        =  graycomatrix(image, [1, 2, 4, 8, 16], [0, np.pi/8, np.pi/4, 3*np.pi/8, np.pi/2, 5*np.pi/8, 3*np.pi/4, 7*np.pi/8])
-    energy      =  graycoprops(glcm, 'energy')
-    homogeneity =  graycoprops(glcm, 'homogeneity')
-    asm         =  graycoprops(glcm, 'ASM')
-    entropy     =  shannon_entropy(glcm, base=2)
+    # Numero de cores
+    __n_colors: float
     
-    tmp = np.concatenate((energy, homogeneity, entropy), axis=None)
+    # Raio da matriz de suavização gaussiana. 0 desabilita
+    __gaussian_strength: int
+    
+    # Em quanto cada um desses elementos será realçado
+    # no pré-processamento. 1 os mantém igual, valores de 0 a 1
+    # os reduzem e valores maiores que 1 aumentam
+    __sharpness_boost_strength:  float
+    __contrast_boost_strength :  float
+    __brightness_boost_strength: float
+
+    # Distancias na matriz de co-ocorrencia
+    __distances_glcm: np.empty(0, dtype=np.int32)
+
+    # Angulos para calcular matriz de co-ocorrencia
+    __angles_glcm: np.empty(0, dtype=np.float64)
+
+    def __init__(self):
+        self.__model_kernel = "linear"
+        self.__model = svm.SVC(kernel=self.__model_kernel)
+
+        '''
+        self.__images_train  = np.empty(0, dtype=np.float64)
+        self.__answers_train = np.empty(0, dtype=np.float64)
+        self.__images_test   = np.empty(0, dtype=np.float64)
+        self.__answers_test  = np.empty(0, dtype=np.float64)
+        self.__predictions   = np.empty(0, dtype=np.float64)
+        '''
+
+        self.__images_train  = []
+        self.__answers_train = []
+        self.__images_test   = []
+        self.__answers_test  = []
+        self.__predictions   = []
+
+        self.__supported_img_extensions = ['.jpg', '.jpeg', '.png']
+
+        # Valores default. Podem ser escolhidos outros pela interface e pelo metodo set :)
+        self.__n_colors = 32
+        self.__gaussian_strength = 1
+        self.__sharpness_boost_strength  = 1
+        self.__contrast_boost_strength   = 1
+        self.__brightness_boost_strength = 1
+        self.__percentage_train = 75
+
+        self.__distances_glcm = np.array([
+            1, 
+            2, 
+            4, 
+            8, 
+            16
+        ])
+
+        self.__angles_glcm = np.array([
+            0, 
+            np.pi/8, 
+            np.pi/4, 
+            3*np.pi/8, 
+            np.pi/2, 
+            5*np.pi/8, 
+            3*np.pi/4, 
+            7*np.pi/8
+        ])
+
+    # Gets e Sets :)
+
+    def set_model_kernel(self, k: str):
+        self.__model_kernel = k
+    
+    def get_model_kernel(self):
+        return self.__model_kernel
+
+    def set_n_colors(self, n_colors: int):
+        self.__n_colors = n_colors
+    
+    def get_n_colors(self):
+        return self.__n_colors
+
+    def set_gaussian_strength(self, strength: int):
+        self.__gaussian_strength = strength
+    
+    def get_gaussian_strength(self):
+        return self.__gaussian_strength
+    
+    def set_sharpness_boost_strength(self, strength: float):
+        self.__sharpness_boost_strength = strength
+    
+    def get_sharpness_boost_strength(self):
+        return self.__sharpness_boost_strength
+
+    def set_contrast_boost_strength(self, strength: float):
+        self.__contrast_boost_strength = strength
+    
+    def get_contrast_boost_strength(self):
+        return self.__contrast_boost_strength
+
+    def set_brightness_boost_strength(self, strength: float):
+        self.__brightness_boost_strength = strength
+    
+    def get_brightness_boost_strength(self):
+        return self.__brightness_boost_strength
+
+    def set_percentage_train(self, percentage: int):
+        self.__percentage_train = percentage
+    
+    def get_percentage_train(self):
+        return self.__percentage_train
+
+    def set_images_dir(self, dir: str):
+        self.__images_dir = dir
+
+    def get_images_dir(self):
+        return self.__images_dir
+
+    def get_supported_img_extensions(self):
+        return self.__supported_img_extensions
+
+    def get_images_train(self):
+        return self.__images_train
+
+    def get_answers_train(self):
+        return self.__answers_train
+
+    def get_images_test(self):
+        return self.__images_test
+
+    def get_answers_test(self):
+        return self.__answers_test
+
+    def get_predictions(self):
+        return self.__predictions
+
+    '''
+    Returns two sets containing the training and testing sets, respectively
+    @param train_size: an int from 1 to 99 indicating how much of the available
+    data will be used for training
+    '''
+    def split_train_test(self):
+        density_classes = ["1", "2", "3", "4"]
+        for density_class in density_classes:
+            path_images = [f for f in os.listdir(f"{self.get_images_dir()}/{density_class}") if f.endswith(tuple(self.get_supported_img_extensions()))]
+            
+            tmp_train, tmp_test = train_test_split(path_images, train_size=self.__percentage_train, shuffle=True)
+
+            # Para cada imagem no conjunto de treino, extrair os descritores de textura abaixo e concatená-los
+            # ao conjunto de treino
+            for i in tmp_train:
+                image         =  np.asarray(Image.open(f"{self.get_images_dir()}/{density_class}/{i}").quantize(self.get_n_colors()))
+                
+                glcm          =  graycomatrix(image, self.__distances_glcm, self.__angles_glcm, levels=self.get_n_colors())
+                energy        =  graycoprops(glcm, 'energy')
+                homogeneity   =  graycoprops(glcm, 'homogeneity')
+                asm           =  graycoprops(glcm, 'ASM')
+                dissimilarity =  graycoprops(glcm, 'dissimilarity')
+                correlation   =  graycoprops(glcm, 'correlation')
+                contrast      =  graycoprops(glcm, 'contrast')
+                entropy       =  shannon_entropy(glcm, base=2)
+                '''
+                descriptors = np.concatenate((energy, homogeneity, entropy, asm, dissimilarity, correlation, contrast), axis=None)
+
+                self.__images_train  = np.append(self.__images_train, descriptors)
+                self.__answers_train = np.append(self.__answers_train, f"{density_class}")
+                '''
+
+                descriptors = np.concatenate((energy, homogeneity, entropy, asm, dissimilarity, correlation, contrast), axis=None)
+                self.__images_train.append(descriptors)
+                self.__answers_train.append(f"{density_class}")
+            # Mesma coisa que antes, só que concatenar ao conjunto de teste
+            for i in tmp_test:
+                image         =  np.asarray(Image.open(f"{self.get_images_dir()}/{density_class}/{i}").quantize(self.get_n_colors()))
+
+                glcm          =  graycomatrix(image, self.__distances_glcm, self.__angles_glcm, levels=self.get_n_colors())
+                energy        =  graycoprops(glcm, 'energy')
+                homogeneity   =  graycoprops(glcm, 'homogeneity')
+                asm           =  graycoprops(glcm, 'ASM')
+                dissimilarity =  graycoprops(glcm, 'dissimilarity')
+                correlation   =  graycoprops(glcm, 'correlation')
+                contrast      =  graycoprops(glcm, 'contrast')
+                entropy       =  shannon_entropy(glcm, base=2)
+                
+                descriptors = np.concatenate((energy, homogeneity, entropy, asm, dissimilarity, correlation, contrast), axis=None)
+                self.__images_test.append(descriptors)
+                self.__answers_test.append(f"{density_class}")
+
+                '''
+                descriptors = np.concatenate((energy, homogeneity, entropy, asm, dissimilarity, correlation, contrast), axis=None)
+
+                self.__images_test  = np.append(self.__images_test, descriptors)
+                self.__answers_test = np.append(self.__answers_test, f"{density_class}")
+                '''
+    def train_model(self):
+        self.__model.fit(self.get_images_train(), self.get_answers_train())
+
+    def predict_with_test_imgs(self):
+        self.__predictions = self.__model.predict(self.get_images_test())
