@@ -2,10 +2,11 @@ from classifier import ImageClassifier
 import sklearn.metrics
 a = ImageClassifier()
 a.set_images_dir("../Imagens")
-a.split_train_test()
-a.train_model()
-a.predict_with_test_imgs()
-print(a.get_prediction_metrics())
+#a.split_train_test()
+#a.train_model()
+a.preview_singe_image("1/p_d_left_cc(12).png")
+#a.predict_with_test_imgs()
+#print(a.get_prediction_metrics())
 
 #a.get_single_image_histogram("1/p_d_left_cc(12).png")
 

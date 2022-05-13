@@ -285,9 +285,22 @@ class ImageClassifier:
         plt.hist(histogram, bins=20, color=['gray'])
         plt.ylabel("Número de ocorrências")
         plt.xlabel("Tom de cinza")
+        ## TROCAR PARA UMA FUNCAO DO PYSIMPLEGUI
         plt.show()
 
         print(histogram)
+
+    '''
+    Retorna o histograma de uma única imagem
+    @params:
+        filepath -> Um path válido para uma imagem a partir do pasta self.get_images_dir()
+    '''
+    def preview_singe_image(self, filepath: str):
+        image = Image.open(f"{self.get_images_dir()}/{filepath}")
+        image = self.pre_process_img(image)
+
+        # TROCAR QND FOR NO PYSIMPLEGUI
+        image.show()
 
 
     '''
@@ -318,6 +331,26 @@ class ImageClassifier:
     def process_img(self, filepath: str):
         image =  Image.open(f"{self.get_images_dir()}/{filepath}")
 
+        image = self.pre_process_img(image)
+
+        # Gerando matriz de co-ocorrência
+        glcm = graycomatrix(image, self.get_distances_glcm(), self.get_angles_glcm(), levels=self.get_n_colors())
+        
+        texture_descriptors = []
+        # A entropia não pode ser pega com a função graycoprops, então ela precisa ser pega aqui
+        texture_descriptors.append(shannon_entropy(glcm, base=2))
+
+        # Extraindo valores para os descritores de textura
+        for i in self.get_texture_descriptors():
+            texture_descriptors.append(graycoprops(glcm, i))
+
+        # Ajuntando todos em um array só
+        descriptors = np.concatenate((texture_descriptors), axis=None)
+
+        return descriptors
+
+    
+    def pre_process_img(self, image: Image):
         # Pré-processamento com suavização gaussiana e filtros para alterar sharpness,
         # contraste, cor e brilho
         image = image.filter(ImageFilter.GaussianBlur(radius=self.get_gaussian_radius()))
@@ -337,18 +370,4 @@ class ImageClassifier:
         # Reamostragem dos tons de cinza
         image = image.quantize(self.get_n_colors())
 
-        # Gerando matriz de co-ocorrência
-        glcm = graycomatrix(image, self.get_distances_glcm(), self.get_angles_glcm(), levels=self.get_n_colors())
-        
-        texture_descriptors = []
-        # A entropia não pode ser pega com a função graycoprops, então ela precisa ser pega aqui
-        texture_descriptors.append(shannon_entropy(glcm, base=2))
-
-        # Extraindo valores para os descritores de textura
-        for i in self.get_texture_descriptors():
-            texture_descriptors.append(graycoprops(glcm, i))
-
-        # Ajuntando todos em um array só
-        descriptors = np.concatenate((texture_descriptors), axis=None)
-
-        return descriptors
+        return image
