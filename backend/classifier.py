@@ -1,4 +1,4 @@
-import os
+import os, time
 
 import sklearn.metrics
 from skimage.feature import graycomatrix, graycoprops
@@ -45,7 +45,7 @@ class ImageClassifier:
     __n_colors: float
     
     # Raio da matriz de suavização gaussiana. 0 desabilita
-    __gaussian_radius: int
+    __gaussian_radius: float
     
     # Em quanto cada um desses elementos será realçado
     # no pré-processamento. 1 os mantém igual, valores de 0 a 1
@@ -54,6 +54,9 @@ class ImageClassifier:
     __contrast_boost_strength :  float
     __brightness_boost_strength: float
     __color_boost_strength:      float
+
+    # Tempos de execução de diferentes funções são armazenadas aqui
+    __runtime_metrics: dict
 
     # Distancias na matriz de co-ocorrencia
     __distances_glcm: np.empty(0, dtype=np.int32)
@@ -83,6 +86,8 @@ class ImageClassifier:
         self.__color_boost_strength      = 2.4
         self.__percentage_train = 75
 
+        self.__runtime_metrics = {}
+
         self.__distances_glcm = np.array([
             1, 
             2, 
@@ -111,7 +116,6 @@ class ImageClassifier:
         ])
         
 
-
     # Gets e Sets :)
     def set_model_kernel(self, k: str):
         self.__model_kernel = k
@@ -125,7 +129,7 @@ class ImageClassifier:
     def get_n_colors(self):
         return self.__n_colors
 
-    def set_gaussian_radius(self, strength: int):
+    def set_gaussian_radius(self, strength: float):
         self.__gaussian_radius = strength
     
     def get_gaussian_radius(self):
@@ -203,6 +207,11 @@ class ImageClassifier:
     def get_texture_descriptors(self):
         return self.__texture_descriptors
 
+    def set_runtime_metric(self, metric_name: str, measured_time: float):
+        self.__runtime_metrics[metric_name] = f"{measured_time:.6f} s"
+    
+    def get_runtime_metrics(self):
+        return self.__runtime_metrics
 
     '''
     Essa função separa as imagens encontradas nas pastas de acordo com self.__percentage_train, com 
@@ -218,7 +227,12 @@ class ImageClassifier:
         tmp_train_set = []
         tmp_test_set  = []
 
+        # Essas são as 4 classes BIRADS
         density_classes = ["1", "2", "3", "4"]
+
+        # Início to cronômetro para separação
+        start = time.perf_counter()
+
         for density_class in density_classes:
             path_images = [f for f in os.listdir(f"{self.get_images_dir()}/{density_class}") if f.endswith(tuple(self.get_supported_img_extensions()))]
             
@@ -239,7 +253,12 @@ class ImageClassifier:
 
                 tmp_test_set.append(descriptors)
                 self.__answers_test = np.append(self.__answers_test, [density_class], axis=0)
-                
+        
+        # Fim da separação
+        end = time.perf_counter()
+
+        self.set_runtime_metric("Split treino e teste", end - start)
+
         # Transformando de volta para um array numpy
         self.__images_train = np.asarray(tmp_train_set)
         self.__images_test  = np.asarray(tmp_test_set)
@@ -250,16 +269,22 @@ class ImageClassifier:
     somente depois de self.split_train_test()
     '''
     def train_model(self):
+        start = time.perf_counter()
         self.__model.fit(self.get_images_train(), self.get_answers_train())
+        end   = time.perf_counter()
 
+        self.set_runtime_metric("Treino", end-start)
 
     '''
     Faz a previsão do modelo com os dados de teste. Deve ser chamada somente depois
     de self.split_train_test() e de self.train_model()
     '''
-    def predict_with_test_imgs(self):
+    def predict_test_images(self):
+        start = time.perf_counter()
         self.__predictions = self.__model.predict(self.get_images_test())
+        end   = time.perf_counter()
 
+        self.set_runtime_metric("Previsão imagens de teste", end - start)
 
     '''
     Prevê a classe de uma única imagem e retorna esse valor.
@@ -267,9 +292,15 @@ class ImageClassifier:
         filepath -> Um path válido para uma imagem a partir do pasta self.get_images_dir()
     '''
     def predict_single_image(self, filepath: str):
-        descriptors = self.process_img(filepath)
+        start = time.perf_counter()
 
-        return self.__model.predict([descriptors])
+        descriptors = self.process_img(filepath)
+        birads_class = self.__model.predict([descriptors])
+        
+        end   = time.perf_counter()
+        self.set_runtime_metric("Previsão imagem única", end - start)
+
+        return birads_class
 
     '''
     Retorna o histograma de uma única imagem
@@ -277,6 +308,8 @@ class ImageClassifier:
         filepath -> Um path válido para uma imagem a partir do pasta self.get_images_dir()
     '''
     def get_single_image_histogram(self, filepath: str):
+        start = time.perf_counter()
+
         image = Image.open(f"{self.get_images_dir()}/{filepath}")
         image = image.quantize(self.get_n_colors())
 
@@ -288,6 +321,10 @@ class ImageClassifier:
         ## TROCAR PARA UMA FUNCAO DO PYSIMPLEGUI
         plt.show()
 
+        end = time.perf_counter()
+
+        self.set_runtime_metric("Geração de Histograma", end - start)
+
         print(histogram)
 
     '''
@@ -296,17 +333,24 @@ class ImageClassifier:
         filepath -> Um path válido para uma imagem a partir do pasta self.get_images_dir()
     '''
     def preview_singe_image(self, filepath: str):
+        start = time.perf_counter()
+
         image = Image.open(f"{self.get_images_dir()}/{filepath}")
         image = self.pre_process_img(image)
 
         # TROCAR QND FOR NO PYSIMPLEGUI
         image.show()
+        end = time.perf_counter()
+
+        self.set_runtime_metric("Preview da imagem", end - start)
 
 
     '''
     Retorna os valores para as métricas de avaliação após o treinamento e os testes
     '''
     def get_prediction_metrics(self):
+        start = time.perf_counter()
+
         accuracy = sklearn.metrics.accuracy_score(self.get_answers_test(), self.get_predictions())
         c_matrix = sklearn.metrics.confusion_matrix(self.get_answers_test(), self.get_predictions())
         especificidade = (100 - accuracy)/300
@@ -319,18 +363,21 @@ class ImageClassifier:
 
         plt.savefig(f"./metricas.png")
 
+        end = time.perf_counter()
+
+        self.set_runtime_metric("Geração das métricas de avaliação", end - start)
+
         return accuracy, especificidade
     
-    
-
     '''
     Processa a imagem e retorna um array com os valores para os descritores de textura.
     @params: 
         filepath -> Um path válido para uma imagem a partir do pasta self.get_images_dir()
     '''
     def process_img(self, filepath: str):
-        image =  Image.open(f"{self.get_images_dir()}/{filepath}")
+        start = time.perf_counter()
 
+        image =  Image.open(f"{self.get_images_dir()}/{filepath}")
         image = self.pre_process_img(image)
 
         # Gerando matriz de co-ocorrência
@@ -347,10 +394,16 @@ class ImageClassifier:
         # Ajuntando todos em um array só
         descriptors = np.concatenate((texture_descriptors), axis=None)
 
+        end = time.perf_counter()
+
+        self.set_runtime_metric("Processamento de uma imagem", end - start)
+
         return descriptors
 
     
     def pre_process_img(self, image: Image):
+        start = time.perf_counter()
+
         # Pré-processamento com suavização gaussiana e filtros para alterar sharpness,
         # contraste, cor e brilho
         image = image.filter(ImageFilter.GaussianBlur(radius=self.get_gaussian_radius()))
@@ -369,5 +422,8 @@ class ImageClassifier:
 
         # Reamostragem dos tons de cinza
         image = image.quantize(self.get_n_colors())
+        end = time.perf_counter()
+
+        self.set_runtime_metric("Pré-processamento", end - start)
 
         return image

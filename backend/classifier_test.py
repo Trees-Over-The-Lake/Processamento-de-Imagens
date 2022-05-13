@@ -1,35 +1,38 @@
 from classifier import ImageClassifier
-import sklearn.metrics
-a = ImageClassifier()
-a.set_images_dir("../Imagens")
-#a.split_train_test()
-#a.train_model()
-a.preview_singe_image("1/p_d_left_cc(12).png")
-#a.predict_with_test_imgs()
-#print(a.get_prediction_metrics())
 
-#a.get_single_image_histogram("1/p_d_left_cc(12).png")
+classifier = ImageClassifier()
 
 '''
-clf = svm.SVC(kernel="linear")
-    clf.fit(train, train_answers)
+ESSENCIAIS:
+    classifier.set_images_dir(str) -> Recebe a localizacao da pasta Imagens para saber onde elas estão
+    classifier.split_train_test()  -> Realiza automaticamente a separação das imagens de treino e teste
+    classifier.train_model()       -> Treina o modelo de acordo com as imagens de treino
 
-    prediction = clf.predict(test)
-    
-    accuracy = sklearn.metrics.accuracy_score(test_answers, prediction)
-    confusion_matrix = sklearn.metrics.confusion_matrix(test_answers, prediction)
+PRÉ-PROCESSAMENTO:
+    classifier.set_gaussian_radius(float)           -> Define o raio da matriz gaussiana para suavização
+    classifier.set_sharpness_boost_strength(float)  -> Define a força do filtro de sharpen
+    classifier.set_contrast_boost_strength(float)   -> Define a força do filtro de contraste
+    classifier.set_brightness_boost_strength(float) -> Define a força do filtro de brilho
+    classifier.set_color_boost_strength(float)      -> Define a força do filtro de cor
+    classifier.set_n_colors(int)                    -> Define o número de cores usado para a quantização
 
-    especificidade = 0
+EXTRAS: 
+    classifier.predict_test_images()     -> Prediz a classe BIRADS das imagens de teste
+    classifier.predict_single_image(str) -> Prediz a classe BIRADS de uma única imagem
+    classifier.get_runtime_metrics()     -> Retorna os tempos de execução medidos para cada função
+    classifier.set_model_kernel(str)     -> Define a kernel utilizada pelo modelo
+ '''
+ 
+classifier.set_images_dir("../Imagens")
 
-    print(f"Accuracy = {accuracy}")
-    print(f"Matriz de confusão = {confusion_matrix}")
+classifier.split_train_test()
 
-    plt.matshow(confusion_matrix, fignum="int")
+classifier.train_model()
+classifier.predict_single_image("1/p_d_left_cc(12).png")
+#classifier.preview_singe_image("1/p_d_left_cc(12).png")
+classifier.predict_test_images()
+#print(classifier.get_prediction_metrics())
 
-    for (i, j), z in np.ndenumerate(confusion_matrix):
-        plt.text(j, i, '{:0.1f}'.format(z), ha='center', va='center',
-                bbox=dict(boxstyle='round', facecolor='white', edgecolor='0.3'))
+print(classifier.get_runtime_metrics())
 
-    plt.savefig(f"./metricas.png")
-    return accuracy, especificidade
-'''
+#classifier.get_single_image_histogram("1/p_d_left_cc(12).png")
