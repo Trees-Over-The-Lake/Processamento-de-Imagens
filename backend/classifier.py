@@ -1,6 +1,4 @@
 import os
-import string
-import numpy as np
 
 import sklearn.metrics
 from skimage.feature import graycomatrix, graycoprops
@@ -8,6 +6,8 @@ from skimage import io
 from sklearn import svm
 from skimage.measure import shannon_entropy
 from sklearn.model_selection import train_test_split
+
+import numpy as np
 
 from matplotlib import pyplot as plt
 
@@ -20,6 +20,9 @@ class ImageClassifier:
     
     # Kernel do modelo
     __model_kernel: str
+
+    # Descritores de textura
+    __texture_descriptors: list
 
     ## Arrays com os conjuntos de treino e teste, bem como as respostas
     __images_train:  np.empty(0, dtype=np.float64)
@@ -61,7 +64,7 @@ class ImageClassifier:
 
     def __init__(self):
         self.__model_kernel = "linear"
-        self.__model = svm.SVC(kernel=self.__model_kernel, C=1.15)
+        self.__model = svm.SVC(kernel=self.__model_kernel, C=1.1)
         
         self.__images_train  = np.empty(0, dtype=np.float64)
         self.__images_test   = np.empty(0, dtype=np.float64)
@@ -74,10 +77,10 @@ class ImageClassifier:
         # Valores default. Outros valores podem ser escolhidos pela interface e pelo metodo set :)
         self.__n_colors = 32
         self.__gaussian_radius = 0.15
-        self.__sharpness_boost_strength  = 1
-        self.__contrast_boost_strength   = 1
+        self.__sharpness_boost_strength  = 1.2
+        self.__contrast_boost_strength   = 1.4
         self.__brightness_boost_strength = 1
-        self.__color_boost_strength      = 1
+        self.__color_boost_strength      = 2.4
         self.__percentage_train = 75
 
         self.__distances_glcm = np.array([
@@ -98,6 +101,15 @@ class ImageClassifier:
             3*np.pi/4, 
             7*np.pi/8
         ])
+
+        self.__texture_descriptors = np.array([
+            "energy", 
+            "homogeneity",
+            "dissimilarity", 
+            "correlation",
+            "contrast"
+        ])
+        
 
 
     # Gets e Sets :)
@@ -173,12 +185,30 @@ class ImageClassifier:
     def get_predictions(self):
         return self.__predictions
 
+    def set_distances_glcm(self, distances: list):
+        self.__distances_glcm = distances
+    
+    def get_distances_glcm(self):
+        return self.__distances_glcm
+
+    def set_angles_glcm(self, angles: list):
+        self.__angles_glcm = angles
+
+    def get_angles_glcm(self):
+        return self.__angles_glcm
+
+    def set_texture_descriptors(self, descriptors: list):
+        self.__texture_descriptors = descriptors
+
+    def get_texture_descriptors(self):
+        return self.__texture_descriptors
+
+
     '''
     Essa função separa as imagens encontradas nas pastas de acordo com self.__percentage_train, com 
     balanceamento equilibrado entre as 4 classes.
     '''
     def split_train_test(self):
-        
         '''
         Infelizmente não há como saber quantos elementos os arrays vão ocupar de antemão,
         e isso impossibilita usar arrays numpy para armazenar diretamente os dados resultados.
@@ -197,60 +227,15 @@ class ImageClassifier:
             # Para cada imagem no conjunto de treino, extrair os descritores de textura abaixo e concatená-los
             # ao conjunto de treino
             for i in tmp_train:
-                image =  Image.open(f"{self.get_images_dir()}/{density_class}/{i}")
+                descriptors = self.process_img(f"{self.get_images_dir()}/{density_class}/{i}")
 
-                # Pré-processamento com suavização gaussiana e filtros para alterar sharpness,
-                # contraste, cor e brilho
-                image = image.filter(ImageFilter.GaussianBlur(radius=self.get_gaussian_radius()))
-
-                enhancer_sharpness = ImageEnhance.Sharpness(image)
-                image = enhancer_sharpness.enhance(self.get_sharpness_boost_strength())
-
-                enhancer_contrast = ImageEnhance.Contrast(image)
-                image = enhancer_contrast.enhance(self.get_contrast_boost_strength())
-
-                enhancer_color = ImageEnhance.Color(image)
-                image= enhancer_color.enhance(self.get_color_boost_strength())
-
-                enhancer_brightness = ImageEnhance.Brightness(image)
-                image= enhancer_brightness.enhance(self.get_brightness_boost_strength())
-
-                # Reamostragem dos tons de cinza
-                image = image.quantize(self.get_n_colors())
-
-                # Gerando matriz de co-ocorrência
-                glcm          =  graycomatrix(image, self.__distances_glcm, self.__angles_glcm, levels=self.get_n_colors())
-                
-                # Extraindo descritores de textura
-                energy        =  graycoprops(glcm, 'energy')
-                homogeneity   =  graycoprops(glcm, 'homogeneity')
-                asm           =  graycoprops(glcm, 'ASM')
-                dissimilarity =  graycoprops(glcm, 'dissimilarity')
-                correlation   =  graycoprops(glcm, 'correlation')
-                contrast      =  graycoprops(glcm, 'contrast')
-                entropy       =  shannon_entropy(glcm, base=2)
-                
-                # Ajuntando todos em um array só
-                descriptors = np.concatenate((energy, homogeneity, entropy, asm, dissimilarity, correlation, contrast), axis=None)
-                
                 tmp_train_set.append(descriptors)
                 self.__answers_train = np.append(self.__answers_train, [density_class], axis=0)
 
             
-            # Mesma coisa que antes, só que concatenar ao conjunto de teste
+            # Mesma coisa que antes, só que concatenar ao conjunto de teste. As operações são as mesmas.
             for i in tmp_test:
-                image         =  np.asarray(Image.open(f"{self.get_images_dir()}/{density_class}/{i}").quantize(self.get_n_colors()))
-
-                glcm          =  graycomatrix(image, self.__distances_glcm, self.__angles_glcm, levels=self.get_n_colors())
-                energy        =  graycoprops(glcm, 'energy')
-                homogeneity   =  graycoprops(glcm, 'homogeneity')
-                asm           =  graycoprops(glcm, 'ASM')
-                dissimilarity =  graycoprops(glcm, 'dissimilarity')
-                correlation   =  graycoprops(glcm, 'correlation')
-                contrast      =  graycoprops(glcm, 'contrast')
-                entropy       =  shannon_entropy(glcm, base=2)
-                
-                descriptors = np.concatenate((energy, homogeneity, entropy, asm, dissimilarity, correlation, contrast), axis=None)
+                descriptors = self.process_img(f"{self.get_images_dir()}/{density_class}/{i}")
 
                 tmp_test_set.append(descriptors)
                 self.__answers_test = np.append(self.__answers_test, [density_class], axis=0)
@@ -260,9 +245,110 @@ class ImageClassifier:
         self.__images_test  = np.asarray(tmp_test_set)
 
 
+    '''
+    Treina o modelo com as imagens em self.get_images_train(). Deve ser chamada
+    somente depois de self.split_train_test()
+    '''
     def train_model(self):
         self.__model.fit(self.get_images_train(), self.get_answers_train())
 
 
+    '''
+    Faz a previsão do modelo com os dados de teste. Deve ser chamada somente depois
+    de self.split_train_test() e de self.train_model()
+    '''
     def predict_with_test_imgs(self):
         self.__predictions = self.__model.predict(self.get_images_test())
+
+
+    '''
+    Prevê a classe de uma única imagem e retorna esse valor.
+    @params:
+        filepath -> Um path válido para uma imagem a partir do pasta self.get_images_dir()
+    '''
+    def predict_single_image(self, filepath: str):
+        descriptors = self.process_img(filepath)
+
+        return self.__model.predict([descriptors])
+
+    '''
+    Retorna o histograma de uma única imagem
+    @params:
+        filepath -> Um path válido para uma imagem a partir do pasta self.get_images_dir()
+    '''
+    def get_single_image_histogram(self, filepath: str):
+        image = Image.open(f"{self.get_images_dir()}/{filepath}")
+        image = image.quantize(self.get_n_colors())
+
+        histogram = image.histogram()
+
+        plt.hist(histogram, bins=20, color=['gray'])
+        plt.ylabel("Número de ocorrências")
+        plt.xlabel("Tom de cinza")
+        plt.show()
+
+        print(histogram)
+
+
+    '''
+    Retorna os valores para as métricas de avaliação após o treinamento e os testes
+    '''
+    def get_prediction_metrics(self):
+        accuracy = sklearn.metrics.accuracy_score(self.get_answers_test(), self.get_predictions())
+        c_matrix = sklearn.metrics.confusion_matrix(self.get_answers_test(), self.get_predictions())
+        especificidade = (100 - accuracy)/300
+
+        plt.matshow(c_matrix, fignum="int")
+
+        for (i, j), z in np.ndenumerate(c_matrix):
+            plt.text(j, i, '{:0.1f}'.format(z), ha='center', va='center', 
+                bbox=dict(boxstyle='round', facecolor='white', edgecolor='0.3'))
+
+        plt.savefig(f"./metricas.png")
+
+        return accuracy, especificidade
+    
+    
+
+    '''
+    Processa a imagem e retorna um array com os valores para os descritores de textura.
+    @params: 
+        filepath -> Um path válido para uma imagem a partir do pasta self.get_images_dir()
+    '''
+    def process_img(self, filepath: str):
+        image =  Image.open(f"{self.get_images_dir()}/{filepath}")
+
+        # Pré-processamento com suavização gaussiana e filtros para alterar sharpness,
+        # contraste, cor e brilho
+        image = image.filter(ImageFilter.GaussianBlur(radius=self.get_gaussian_radius()))
+
+        enhancer_sharpness = ImageEnhance.Sharpness(image)
+        image = enhancer_sharpness.enhance(self.get_sharpness_boost_strength())
+
+        enhancer_contrast = ImageEnhance.Contrast(image)
+        image = enhancer_contrast.enhance(self.get_contrast_boost_strength())
+
+        enhancer_color = ImageEnhance.Color(image)
+        image = enhancer_color.enhance(self.get_color_boost_strength())
+
+        enhancer_brightness = ImageEnhance.Brightness(image)
+        image = enhancer_brightness.enhance(self.get_brightness_boost_strength())
+
+        # Reamostragem dos tons de cinza
+        image = image.quantize(self.get_n_colors())
+
+        # Gerando matriz de co-ocorrência
+        glcm = graycomatrix(image, self.get_distances_glcm(), self.get_angles_glcm(), levels=self.get_n_colors())
+        
+        texture_descriptors = []
+        # A entropia não pode ser pega com a função graycoprops, então ela precisa ser pega aqui
+        texture_descriptors.append(shannon_entropy(glcm, base=2))
+
+        # Extraindo valores para os descritores de textura
+        for i in self.get_texture_descriptors():
+            texture_descriptors.append(graycoprops(glcm, i))
+
+        # Ajuntando todos em um array só
+        descriptors = np.concatenate((texture_descriptors), axis=None)
+
+        return descriptors

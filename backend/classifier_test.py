@@ -5,8 +5,9 @@ a.set_images_dir("../Imagens")
 a.split_train_test()
 a.train_model()
 a.predict_with_test_imgs()
-print(sklearn.metrics.accuracy_score(a.get_answers_test(), a.get_predictions()))
+print(a.get_prediction_metrics())
 
+#a.get_single_image_histogram("1/p_d_left_cc(12).png")
 
 '''
 clf = svm.SVC(kernel="linear")
