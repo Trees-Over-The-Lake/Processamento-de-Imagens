@@ -67,7 +67,7 @@ class ImageClassifier:
 
     def __init__(self):
         self.__model_kernel = "linear"
-        self.__model = svm.SVC(kernel="linear", C=1.4)
+        self.__model = svm.SVC(kernel=self.get_model_kernel(), C=1.4)
 
         self.__images_train  = np.empty(0, dtype=np.float64)
         self.__images_test   = np.empty(0, dtype=np.float64)
@@ -392,7 +392,7 @@ class ImageClassifier:
     @params:
         filepath -> Um path válido para uma imagem a partir do pasta self.get_images_dir()
     '''
-    def preview_singe_image(self, filepath: str):
+    def preview_single_image(self, filepath: str):
         start = time.perf_counter()
 
         image = Image.open(f"{self.get_images_dir()}/{filepath}")
@@ -437,7 +437,7 @@ class ImageClassifier:
         plt.ylabel("Classe correta", labelpad=15, fontsize=13)
         plt.xlabel("Classe estimada", labelpad=20, fontsize=13)
 
-        plt.savefig(f"./metricas.png")
+        plt.savefig(f"./matriz-confusao.png")
 
         end = time.perf_counter()
 
