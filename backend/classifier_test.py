@@ -24,6 +24,10 @@ EXTRAS:
  '''
  
 classifier.set_images_dir("../Imagens")
+classifier.set_gaussian_radius(0)
+classifier.set_sharpness_boost_strength(1.4)
+classifier.set_contrast_boost_strength(2.2)
+classifier.set_brightness_boost_strength(1.1)
 
 classifier.split_train_test()
 
@@ -31,7 +35,7 @@ classifier.train_model()
 classifier.predict_single_image("1/p_d_left_cc(12).png")
 #classifier.preview_singe_image("1/p_d_left_cc(12).png")
 classifier.predict_test_images()
-#print(classifier.get_prediction_metrics())
+print(classifier.get_prediction_metrics())
 
 print(classifier.get_runtime_metrics())
 
