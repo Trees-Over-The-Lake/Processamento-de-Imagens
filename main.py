@@ -1,11 +1,9 @@
 from frontend import front
-from backend import os as backos
-
+import os
 
 # Current working dir
-cwd = backos.getCurrentWorkingDirectory()
 # JPEG and PNG types
 types = [('Images', '*.jpeg *.png *.jpg')]
 
-gui = front.GUI(cwd)
+gui = front.GUI(os.getcwd())
 gui.drawGUI()

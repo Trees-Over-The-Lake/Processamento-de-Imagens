@@ -56,13 +56,25 @@ class GUI:
         
     def startScreen(self):
         # Elementos da tela de predição
-        layout = [
-                    [sg.Text('Como funciona o trabalho?')],
-                    [sg.Button('funcionamento'), sg.Button('Opções avançadas')],
-                    [sg.Button('Iniciar')],
-                 ]
+
+        topbar = [
+                    [sg.Text('Reconhecimento Automático de Densidade da Mama',font=("Helvetica 17 bold"), size=(None, 3))],
+                    [sg.Image(source="frontend/assets/logo-puc-minas.png")]
+        ]
         
-        window = sg.Window('Predição das Mamografias', layout, resizable=False, font=('Helvetica', 16))
+        centered_elements = [
+                    [sg.Button('Como funciona?', border_width=4, key="__help"), sg.Button('Opções avançadas', border_width=4, key="__options")],
+                    [sg.Button('Iniciar', border_width=4, key="__start")],
+        ]
+
+        layout = [
+                topbar,
+                [sg.VPush()],
+                [sg.Push(), sg.Column(centered_elements, element_justification='c'), sg.Push()],
+                [sg.VPush()]
+        ]
+
+        window = sg.Window('Predição das Mamografias', layout, resizable=False, font=('Helvetica', 16), auto_size_text=True)
         
         while self.loop:
             event, values = window.read()
@@ -71,11 +83,20 @@ class GUI:
                 self.loop = False
                 break
                 
-            elif event == 'Iniciar':
+            elif event == '__start':
                 window.close()
                 break
+
+            elif event == '__help':
+                text = [
+                    [sg.Text("TESTE")]
+                ]
+
+                window = sg.Window("Ajuda", text)
+                break
+
             
-            elif event == 'Opções avançadas':
+            elif event == '__options':
                 sg.popup_ok_cancel('Tem certeza que deseja configurar as opções avançadas?', title='Aviso', font=('Helvetica', 16))
                 window.close()
                 break
