@@ -12,7 +12,7 @@ class GUI:
         self.current_working_dir = current_working_dir
         self.loop = True
         self.modelo = classifier.ImageClassifier()
-        
+
 
     # Draw the GUI and hold it, until the user asks to exit
     def drawGUI(self):
@@ -71,11 +71,7 @@ class GUI:
                 )
 
                 options_window.options_window(self.modelo)
-
-                window.close()
-                break
-            
-            print(values)
+                
 
 
     # Drawing the drawTrainGUI

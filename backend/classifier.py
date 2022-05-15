@@ -395,7 +395,7 @@ class ImageClassifier:
     def preview_single_image(self, filepath: str):
         start = time.perf_counter()
 
-        image = Image.open(f"{self.get_images_dir()}/{filepath}")
+        image = Image.open(f"{filepath}")
         image = self.pre_process_img(image)
 
         # TROCAR QND FOR NO PYSIMPLEGUI
