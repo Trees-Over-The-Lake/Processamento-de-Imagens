@@ -44,7 +44,7 @@ class GUI:
                 [sg.VPush()]
         ]
 
-        window = sg.Window('Predição das Mamografias', layout, resizable=False, font=('Helvetica', 16), auto_size_text=True)
+        window = sg.Window('Predição das Mamografias', layout, resizable=False, font=('Helvetica', 16))
         
         while self.loop:
             event, values = window.read()

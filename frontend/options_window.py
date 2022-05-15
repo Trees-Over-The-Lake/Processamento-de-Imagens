@@ -5,35 +5,39 @@ DEFAULT_IMG="./frontend/assets/sample_preview_image.png"
 def options_window(modelo):
 
     layout_options = [
-        [sg.Text(
-            'Escolha a porcentagem de dados disponível para treino (padrão=75): '), 
+        [
+            sg.Text('Escolha a porcentagem de dados disponível para treino (padrão=75):', font=('Helvetica', 16)),
+            sg.Button("?", border_width=4, key="__help_porcentagem"),
             sg.Slider(range=(1,99), 
-            default_value=modelo.get_percentage_train(), 
-            size=(20,15),
-            orientation='horizontal', 
-            key='-PORCENTAGEM_TREINAMENTO-')
+                default_value=modelo.get_percentage_train(), 
+                size=(20,15),
+                orientation='horizontal', 
+                key='-PORCENTAGEM_TREINAMENTO-')
         ],
-        [sg.Text(
-            'Escolha o raio da matriz gaussiana (padrão=0): '), 
-                sg.Slider(range=(0,4), 
+        [
+            sg.Text('Escolha o raio da matriz gaussiana (padrão=0):', font=('Helvetica', 16)),
+            sg.Button("?", border_width=4, key="__help_gaussian"),
+            sg.Slider(range=(0,4), 
                 default_value=modelo.get_gaussian_radius(),
                 size=(20,15),
                 orientation='horizontal', 
                 key='-RAIO_MATRIX_GAUSSIANA-'
             )
         ],
-        [sg.Text(
-            'Escolha a quantidade de aumento do sharpen (padrão=1.4): '), 
+        [
+            sg.Text('Escolha a quantidade de aumento do sharpen (padrão=1.4):', font=('Helvetica', 16)),
+            sg.Button("?", border_width=4, key="__help_sharpen"),
             sg.Slider(range=([0.0, 4.0]), 
                 resolution=0.2, 
                 default_value=modelo.get_sharpness_boost_strength(),
                 size=(20,15),
                 orientation='horizontal', 
-                key='-SHARPEN_BOOST-'
+                key='-SHARPEN_BOOST-',
                 )
         ],
-        [sg.Text(
-            'Escolha a quantidade de aumento do contraste (padrão=2.2): '), 
+        [
+            sg.Text('Escolha a quantidade de aumento do contraste (padrão=2.2):', font=('Helvetica', 16)),
+            sg.Button("?", border_width=4, key="__help_contrast"),
             sg.Slider(range=([0.0, 4.0]), 
                 resolution=0.2, 
                 default_value=modelo.get_contrast_boost_strength(),
@@ -42,8 +46,9 @@ def options_window(modelo):
                 key='-CONTRAST_BOOST-'
                 )
         ],
-        [sg.Text(
-            'Escolha a quantidade de aumento do brilho (padrão=1.1): '), 
+        [
+            sg.Text('Escolha a quantidade de aumento do brilho (padrão=1.1):', font=('Helvetica', 16)),
+            sg.Button("?", border_width=4, key="__help_brightness"),
             sg.Slider(range=([0.0, 4.0]), 
                 resolution=0.2, 
                 default_value=modelo.get_brightness_boost_strength(),
@@ -67,6 +72,9 @@ def options_window(modelo):
         sharpen_factor    = values['-SHARPEN_BOOST-']
         contrast_factor   = values['-CONTRAST_BOOST-']
         brightness_factor = values['-BRIGHTNESS_BOOST-']
+
+        if event == '__help_porcentagem':
+            print("ABRIR HELP_SHARPEN")
 
         if event == '__ok':
             
