@@ -4,17 +4,20 @@ classifier = ImageClassifier()
 
 '''
 ESSENCIAIS:
-    classifier.set_images_dir(str) -> Recebe a localizacao da pasta Imagens para saber onde elas estão
-    classifier.split_train_test()  -> Realiza automaticamente a separação das imagens de treino e teste
-    classifier.train_model()       -> Treina o modelo de acordo com as imagens de treino
+    classifier.set_images_dir(str)       -> Recebe a localizacao da pasta Imagens para saber onde elas estão
+    classifier.split_train_test()        -> Realiza automaticamente a separação das imagens de treino e teste
+    classifier.train_model()             -> Treina o modelo de acordo com as imagens de treino
+    classifier.set_percentage_train(int) -> Define a porcentagem das imagens que serão usadas para treino
+
 
 PRÉ-PROCESSAMENTO:
-    classifier.set_gaussian_radius(float)           -> Define o raio da matriz gaussiana para suavização
+    classifier.set_gaussian_radius(int)             -> Define o raio da matriz gaussiana para suavização
     classifier.set_sharpness_boost_strength(float)  -> Define a força do filtro de sharpen
     classifier.set_contrast_boost_strength(float)   -> Define a força do filtro de contraste
     classifier.set_brightness_boost_strength(float) -> Define a força do filtro de brilho
     classifier.set_color_boost_strength(float)      -> Define a força do filtro de cor
     classifier.set_n_colors(int)                    -> Define o número de cores usado para a quantização
+
 
 EXTRAS: 
     classifier.predict_test_images()     -> Prediz a classe BIRADS das imagens de teste

@@ -2,6 +2,8 @@ import concurrent.futures
 import PySimpleGUI as sg
 
 from frontend.image import *
+
+from frontend import explanation, options_window
 from backend import classifier
 
 # Class to define all functions to work the frontend
@@ -9,14 +11,75 @@ class GUI:
     def __init__(self, current_working_dir) -> None:
         self.current_working_dir = current_working_dir
         self.loop = True
+        self.modelo = classifier.ImageClassifier()
+        
 
-    # Draw the GUI and hold it, until the user ask to exit
+    # Draw the GUI and hold it, until the user asks to exit
     def drawGUI(self):
-        self.startScreen()
-        self.drawTrainGUI()
+        self.initial_screen()
+        self.main_screen()
+
+
+    def initial_screen(self):
+        # Elementos da tela de predição
+
+        topbar = [
+                    [sg.Text('Reconhecimento Automático de Densidade da Mama',font=("Helvetica 17 bold"), size=(None, 3))],
+                    [sg.Image(source="frontend/assets/logo-puc-minas.png")]
+        ]
+        
+        centered_elements = [
+                    [
+                        sg.Button('Como funciona?', border_width=4, key="__help"), 
+                        sg.Button('Opções avançadas', border_width=4, key="__options"),
+                        sg.Button('Créditos', border_width=4, key="__creditos")
+                    ],
+                    [sg.Button('Iniciar', border_width=4, key="__start")],
+        ]
+
+        layout = [
+                topbar,
+                [sg.VPush()],
+                [sg.Push(), sg.Column(centered_elements, element_justification='c'), sg.Push()],
+                [sg.VPush()]
+        ]
+
+        window = sg.Window('Predição das Mamografias', layout, resizable=False, font=('Helvetica', 16), auto_size_text=True)
+        
+        while self.loop:
+            event, values = window.read()
+            
+            if event == sg.WIN_CLOSED: 
+                self.loop = False
+                break
+                
+            elif event == '__start':
+                window.close()
+                break
+
+            elif event == '__help':
+                explanation.draw_help_window()
+
+            elif event == '__creditos':
+                explanation.draw_credits_window()
+            
+            elif event == '__options':
+                sg.popup_ok_cancel(
+                    'Tem certeza que deseja configurar as opções avançadas? Isto pode afetar o desempenho do modelo!', 
+                    title='Aviso', 
+                    font=('Helvetica', 16)
+                )
+
+                options_window.options_window(self.modelo)
+
+                window.close()
+                break
+            
+            print(values)
+
 
     # Drawing the drawTrainGUI
-    def drawTrainGUI(self):
+    def main_screen(self):
         # All the stuff inside your window.
         layout = [  
                     [sg.Text('\tAplicativo de detecção de tumores em mamografias')],
@@ -53,52 +116,3 @@ class GUI:
                 break
 
         window.close()
-        
-    def startScreen(self):
-        # Elementos da tela de predição
-
-        topbar = [
-                    [sg.Text('Reconhecimento Automático de Densidade da Mama',font=("Helvetica 17 bold"), size=(None, 3))],
-                    [sg.Image(source="frontend/assets/logo-puc-minas.png")]
-        ]
-        
-        centered_elements = [
-                    [sg.Button('Como funciona?', border_width=4, key="__help"), sg.Button('Opções avançadas', border_width=4, key="__options")],
-                    [sg.Button('Iniciar', border_width=4, key="__start")],
-        ]
-
-        layout = [
-                topbar,
-                [sg.VPush()],
-                [sg.Push(), sg.Column(centered_elements, element_justification='c'), sg.Push()],
-                [sg.VPush()]
-        ]
-
-        window = sg.Window('Predição das Mamografias', layout, resizable=False, font=('Helvetica', 16), auto_size_text=True)
-        
-        while self.loop:
-            event, values = window.read()
-            
-            if event == sg.WIN_CLOSED: 
-                self.loop = False
-                break
-                
-            elif event == '__start':
-                window.close()
-                break
-
-            elif event == '__help':
-                text = [
-                    [sg.Text("TESTE")]
-                ]
-
-                window = sg.Window("Ajuda", text)
-                break
-
-            
-            elif event == '__options':
-                sg.popup_ok_cancel('Tem certeza que deseja configurar as opções avançadas?', title='Aviso', font=('Helvetica', 16))
-                window.close()
-                break
-            
-            print(values)
