@@ -8,7 +8,7 @@ def options_window(modelo):
         [sg.Text(
             'Escolha a porcentagem de dados disponível para treino (padrão=75): '), 
             sg.Slider(range=(1,99), 
-            default_value=75, 
+            default_value=modelo.get_percentage_train(), 
             size=(20,15),
             orientation='horizontal', 
             key='-PORCENTAGEM_TREINAMENTO-')
@@ -16,7 +16,7 @@ def options_window(modelo):
         [sg.Text(
             'Escolha o raio da matriz gaussiana (padrão=0): '), 
                 sg.Slider(range=(0,4), 
-                default_value=0,
+                default_value=modelo.get_gaussian_radius(),
                 size=(20,15),
                 orientation='horizontal', 
                 key='-RAIO_MATRIX_GAUSSIANA-'
@@ -26,7 +26,7 @@ def options_window(modelo):
             'Escolha a quantidade de aumento do sharpen (padrão=1.4): '), 
             sg.Slider(range=([0.0, 4.0]), 
                 resolution=0.2, 
-                default_value=1.4,
+                default_value=modelo.get_sharpness_boost_strength(),
                 size=(20,15),
                 orientation='horizontal', 
                 key='-SHARPEN_BOOST-'
@@ -36,7 +36,7 @@ def options_window(modelo):
             'Escolha a quantidade de aumento do contraste (padrão=2.2): '), 
             sg.Slider(range=([0.0, 4.0]), 
                 resolution=0.2, 
-                default_value=2.2,
+                default_value=modelo.get_contrast_boost_strength(),
                 size=(20,15),
                 orientation='horizontal', 
                 key='-CONTRAST_BOOST-'
@@ -46,7 +46,7 @@ def options_window(modelo):
             'Escolha a quantidade de aumento do brilho (padrão=1.1): '), 
             sg.Slider(range=([0.0, 4.0]), 
                 resolution=0.2, 
-                default_value=1.1,
+                default_value=modelo.get_brightness_boost_strength(),
                 size=(20,15),
                 orientation='horizontal', 
                 key='-BRIGHTNESS_BOOST-'
@@ -57,31 +57,35 @@ def options_window(modelo):
     ]
 
     options_window = sg.Window('Créditos', layout_options)
-    event, values = options_window.read()
 
-    porcentagem       = values['-PORCENTAGEM_TREINAMENTO-']
-    gaussian_radius   = values['-RAIO_MATRIX_GAUSSIANA-']
-    sharpen_factor    = values['-SHARPEN_BOOST-']
-    contrast_factor   = values['-CONTRAST_BOOST-']
-    brightness_factor = values['-BRIGHTNESS_BOOST-']
-    
-    
-    if event == '__ok':
+    while True:
 
-        modelo.set_percentage_train(porcentagem)
-        modelo.set_gaussian_radius(gaussian_radius)
-        modelo.set_sharpness_boost_strength(sharpen_factor)
-        modelo.set_contrast_boost_strength(contrast_factor)
-        modelo.set_brightness_boost_strength(brightness_factor)
-        
-        options_window.close()
+        event, values = options_window.read()
 
-    elif event == '__preview':
+        porcentagem       = values['-PORCENTAGEM_TREINAMENTO-']
+        gaussian_radius   = values['-RAIO_MATRIX_GAUSSIANA-']
+        sharpen_factor    = values['-SHARPEN_BOOST-']
+        contrast_factor   = values['-CONTRAST_BOOST-']
+        brightness_factor = values['-BRIGHTNESS_BOOST-']
 
-        modelo.set_percentage_train(porcentagem)
-        modelo.set_gaussian_radius(gaussian_radius)
-        modelo.set_sharpness_boost_strength(sharpen_factor)
-        modelo.set_contrast_boost_strength(contrast_factor)
-        modelo.set_brightness_boost_strength(brightness_factor)
+        if event == '__ok':
+            
 
-        modelo.preview_single_image(DEFAULT_IMG)
+            modelo.set_percentage_train(porcentagem)
+            modelo.set_gaussian_radius(gaussian_radius)
+            modelo.set_sharpness_boost_strength(sharpen_factor)
+            modelo.set_contrast_boost_strength(contrast_factor)
+            modelo.set_brightness_boost_strength(brightness_factor)
+            
+            options_window.close()
+            break
+
+        elif event == '__preview':
+
+            modelo.set_percentage_train(porcentagem)
+            modelo.set_gaussian_radius(gaussian_radius)
+            modelo.set_sharpness_boost_strength(sharpen_factor)
+            modelo.set_contrast_boost_strength(contrast_factor)
+            modelo.set_brightness_boost_strength(brightness_factor)
+
+            modelo.preview_single_image(DEFAULT_IMG)
