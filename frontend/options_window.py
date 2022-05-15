@@ -8,60 +8,70 @@ def options_window(modelo):
         [
             sg.Text('Escolha a porcentagem de dados disponível para treino (padrão=75):', font=('Helvetica', 16)),
             sg.Button("?", border_width=4, key="__help_porcentagem"),
-            sg.Slider(range=(1,99), 
-                default_value=modelo.get_percentage_train(), 
-                size=(20,15),
-                orientation='horizontal', 
-                key='-PORCENTAGEM_TREINAMENTO-')
+            
         ],
         [
             sg.Text('Escolha o raio da matriz gaussiana (padrão=0):', font=('Helvetica', 16)),
             sg.Button("?", border_width=4, key="__help_gaussian"),
-            sg.Slider(range=(0,4), 
-                default_value=modelo.get_gaussian_radius(),
-                size=(20,15),
-                orientation='horizontal', 
-                key='-RAIO_MATRIX_GAUSSIANA-'
-            )
+            
         ],
         [
             sg.Text('Escolha a quantidade de aumento do sharpen (padrão=1.4):', font=('Helvetica', 16)),
             sg.Button("?", border_width=4, key="__help_sharpen"),
-            sg.Slider(range=([0.0, 4.0]), 
-                resolution=0.2, 
-                default_value=modelo.get_sharpness_boost_strength(),
-                size=(20,15),
-                orientation='horizontal', 
-                key='-SHARPEN_BOOST-',
-                )
+           
         ],
         [
             sg.Text('Escolha a quantidade de aumento do contraste (padrão=2.2):', font=('Helvetica', 16)),
             sg.Button("?", border_width=4, key="__help_contrast"),
-            sg.Slider(range=([0.0, 4.0]), 
-                resolution=0.2, 
-                default_value=modelo.get_contrast_boost_strength(),
-                size=(20,15),
-                orientation='horizontal', 
-                key='-CONTRAST_BOOST-'
-                )
         ],
         [
             sg.Text('Escolha a quantidade de aumento do brilho (padrão=1.1):', font=('Helvetica', 16)),
             sg.Button("?", border_width=4, key="__help_brightness"),
-            sg.Slider(range=([0.0, 4.0]), 
-                resolution=0.2, 
-                default_value=modelo.get_brightness_boost_strength(),
-                size=(20,15),
-                orientation='horizontal', 
-                key='-BRIGHTNESS_BOOST-'
-                )
         ],
         [sg.Button('Preview das configurações', border_width=4, key="__preview")],
         [sg.Button('Ok!', border_width=4, key="__ok")]
     ]
+    
+    layout_sliders = [
+        [sg.Slider(range=(1,99), 
+                default_value=modelo.get_percentage_train(), 
+                size=(20,15),
+                orientation='horizontal', 
+                key='-PORCENTAGEM_TREINAMENTO-')],
+        [sg.Slider(range=(0,4), 
+                default_value=modelo.get_gaussian_radius(),
+                size=(20,15),
+                orientation='horizontal', 
+                key='-RAIO_MATRIX_GAUSSIANA-'
+            )],
+        [sg.Slider(range=([0.0, 4.0]), 
+            resolution=0.2, 
+            default_value=modelo.get_sharpness_boost_strength(),
+            size=(20,15),
+            orientation='horizontal', 
+            key='-SHARPEN_BOOST-',
+            )],
+        [sg.Slider(range=([0.0, 4.0]), 
+            resolution=0.2, 
+            default_value=modelo.get_contrast_boost_strength(),
+            size=(20,15),
+            orientation='horizontal', 
+            key='-CONTRAST_BOOST-'
+            )],
+        [sg.Slider(range=([0.0, 4.0]), 
+            resolution=0.2, 
+            default_value=modelo.get_brightness_boost_strength(),
+            size=(20,15),
+            orientation='horizontal', 
+            key='-BRIGHTNESS_BOOST-'
+            )]
+    ]
 
-    options_window = sg.Window('Créditos', layout_options)
+    layout_tela = [
+        [sg.Column(layout_options), sg.VSeparator(), sg.Column(layout_sliders)],
+    ]
+
+    options_window = sg.Window('Opções avançadas', layout_tela)
 
     while True:
 
