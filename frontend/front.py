@@ -6,13 +6,16 @@ from backend import classifier
 from frontend.screens import menu
 from frontend.screens import advanced_options
 
+from frontend.screens.models import images
+from PIL import Image
+
 # Class to define all functions to work the frontend
 class GUI:    
     def __init__(self, current_working_dir) -> None:
         self.current_working_dir = current_working_dir
         self.loop = True
         self.modelo = classifier.ImageClassifier()
-
+        self.img_model = images.ImagemModel()
 
     # Draw the GUI and hold it, until the user asks to exit
     def drawGUI(self):
@@ -23,6 +26,11 @@ class GUI:
         # Layout da tela para o usuário
         layout = menu.layout_tela
         layout_opcoes_avancadas: advanced_options.AdvancedOptions
+        
+        # Imagens da tela
+        image_selecionada: Image
+        image_com_filtro: Image
+        histograma: Image
         
         # Criando a janela
         window = sg.Window('Reconhecimento de Tumores', layout, resizable=False, font=('Helvetica', 16))
@@ -50,7 +58,21 @@ class GUI:
             
             # Prever imagem única
             elif event == menu.keys.PREVER_IMAGEM_KEY:
-                print('PREVER_IMAGEM_KEY')
+                # Pegando imagem selecionada pelo usuário
+                imagem = values[menu.keys.PREVER_IMAGEM_KEY]
+                self.img_model.apply_preview_image(imagem, window, menu.keys.TAB_USER_SELECTED_IMAGE_KEY)
+                resultado_predicao = self.modelo.predict_single_image(imagem)
+                
+                # Mostrando imagem com os filtros aplicados
+                self.img_model.apply_preview_PIL_image(self.modelo.preview_single_image(imagem), window, menu.keys.TAB_PREVIEW_IMAGE_KEY)
+                
+                # Adicionando o histograma
+                self.modelo.get_single_image_histogram(imagem)
+                histgr = Image.open('./histograma.png')
+                self.img_model.apply_preview_PIL_image(histgr, window, menu.keys.TAB_IMAGE_HISTOGRAM_KEY)
+                
+                sg.popup_ok(f"Classe BI-RADS identificada: {resultado_predicao[0]}", title='Resultado da Identificação', font=('Helvetica', 16))
+                
             
             # Prever múltiplas imagens
             elif event == menu.keys.PREVER_IMAGENS_KEY:
@@ -86,6 +108,7 @@ class GUI:
             # Créditos da aplicação
             elif event == menu.keys.CREDITOS_KEY:
                 print('CREDITOS_KEY')
+            
 
         # Finalizar aplicação e fechar a janela
         window.close()

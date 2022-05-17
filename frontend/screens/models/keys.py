@@ -47,7 +47,7 @@ TAB_USER_SELECTED_IMAGE_TEXT = 'Imagem Selecionada'
 TAB_USER_SELECTED_IMAGE_KEY = '-TAB_SELECTED_IMAGE-'
 
 # Imagem processada
-TAB_PREVIEW_IMAGE_TEXT = 'Efeitos Aplicados'
+TAB_PREVIEW_IMAGE_TEXT = 'Imagem com Efeitos Aplicados'
 TAB_PREVIEW_IMAGE_KEY = '-TAB_PREVIEW_IMAGE-'
 
 # Histograma

@@ -369,22 +369,19 @@ class ImageClassifier:
     def get_single_image_histogram(self, filepath: str):
         start = time.perf_counter()
 
-        image = Image.open(f"{self.get_images_dir()}/{filepath}")
+        image = Image.open(f"{filepath}")
         image = image.quantize(self.get_n_colors())
 
         histogram = image.histogram()
 
-        plt.hist(histogram, bins=20, color=['gray'])
-        plt.ylabel("Número de ocorrências")
-        plt.xlabel("Tom de cinza")
-        ## TROCAR PARA UMA FUNCAO DO PYSIMPLEGUI
-        plt.show()
+        plt.hist(histogram, color=['gray'])
+        plt.xlabel("Número de ocorrências")
+        plt.ylabel("Tom de cinza")
+        plt.savefig('./histograma.png')
 
         end = time.perf_counter()
 
         self.set_runtime_metric("Geração de Histograma", end - start)
-
-        print(histogram)
 
 
     '''
@@ -398,11 +395,10 @@ class ImageClassifier:
         image = Image.open(f"{filepath}")
         image = self.pre_process_img(image)
 
-        # TROCAR QND FOR NO PYSIMPLEGUI
-        image.show()
         end = time.perf_counter()
 
         self.set_runtime_metric("Preview da imagem", end - start)
+        return image
 
 
     '''

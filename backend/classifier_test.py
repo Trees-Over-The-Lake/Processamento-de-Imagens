@@ -39,8 +39,10 @@ classifier.train_model()
 classifier.predict_single_image(f"{os.getcwd()}/../Imagens/1/p_d_left_cc(12).png")
 #classifier.preview_singe_image("1/p_d_left_cc(12).png")
 classifier.predict_test_images()
-print(classifier.get_prediction_metrics())
+# print(classifier.get_prediction_metrics())
 
-print(classifier.get_runtime_metrics())
+# print(classifier.get_runtime_metrics())
+
+classifier.get_single_image_histogram(f"{os.getcwd()}/../Imagens/1/p_d_left_cc(12).png")
 
 #classifier.get_single_image_histogram("1/p_d_left_cc(12).png")

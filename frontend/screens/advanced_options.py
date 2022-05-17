@@ -87,7 +87,7 @@ class AdvancedOptions:
                 modelo.set_sharpness_boost_strength(values[keys.ADVANCED_OPTIONS_SHARPEN_SLIDER_KEY])
                 modelo.set_contrast_boost_strength(values[keys.ADVANCED_OPTIONS_CONTRAST_SLIDER_KEY])
                 modelo.set_brightness_boost_strength(values[keys.ADVANCED_OPTIONS_BRIGHTNESS_SLIDER_KEY])
-                modelo.set_n_colors(values[keys.ADVANCED_OPTIONS_N_COLORS_SLIDER_KEY])
+                modelo.set_n_colors(int(values[keys.ADVANCED_OPTIONS_N_COLORS_SLIDER_KEY]))
                 
                 # Fechar a janela
                 break
