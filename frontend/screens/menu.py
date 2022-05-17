@@ -42,11 +42,12 @@ layout_tab3 = [
 layout_direita = [
     [sg.TabGroup([[sg.Tab(keys.TAB_USER_SELECTED_IMAGE_TEXT, layout_tab1),
                    sg.Tab(keys.TAB_PREVIEW_IMAGE_TEXT, layout_tab2),
-                   sg.Tab(keys.TAB_IMAGE_HISTOGRAM_TEXT, layout_tab3)]])],
+                   sg.Tab(keys.TAB_IMAGE_HISTOGRAM_TEXT, layout_tab3)]],
+                   key=keys.TAB_GROUP_KEY)],
     [sg.Text(key=keys.OBTER_METRICAS_MODELO_KEY)]
 ]
 
 # Layout da tela final
 layout_tela = [
-    [sg.Column(layout_esquerda), sg.VSeparator(), sg.Column(layout_direita)]
+    [sg.Column(layout_esquerda), sg.VSeparator(), sg.vtop(sg.Column(layout_direita))],
 ]

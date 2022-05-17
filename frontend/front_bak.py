@@ -1,5 +1,5 @@
 import PySimpleGUI as sg
-from frontend.screens import options_window
+from frontend.screens import advanced_options
 
 from frontend.utils import *
 

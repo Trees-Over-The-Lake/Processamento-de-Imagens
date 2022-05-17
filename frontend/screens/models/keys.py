@@ -1,4 +1,6 @@
-### Arquivo contendo todas as keys dos botões e seus devidos textos
+########### Arquivo contendo todas as keys dos botões e seus devidos textos ##########
+
+### Menu principal
 
 # Pasta contendo as imagens para o treinamento e o teste
 ABRIR_PASTA_BIRADS_BUTTON_TEXT = 'Abrir pasta das imagens'
@@ -35,7 +37,10 @@ AJUDA_KEY = '-HELP-'
 CREDITOS_BUTTON_TEXT = 'Créditos'
 CREDITOS_KEY = '-CREDITS-'
 
-### Tabs
+### Tabs do Menu Principal
+
+# Key da group tab
+TAB_GROUP_KEY = '-TAB_GROUP_KEY-'
 
 # Imagem selecionada pelo usuário
 TAB_USER_SELECTED_IMAGE_TEXT = 'Imagem Selecionada'
@@ -48,3 +53,52 @@ TAB_PREVIEW_IMAGE_KEY = '-TAB_PREVIEW_IMAGE-'
 # Histograma
 TAB_IMAGE_HISTOGRAM_TEXT = 'Histograma'
 TAB_IMAGE_HISTOGRAM_KEY = '-TAB_HISTOGRAM-'
+
+### Keys para a tela de opções avançadas
+
+# Texto do botão de ajuda 
+ADVANCED_OPTIONS_GENERAL_HELP_BUTTON_TEXT = '?'
+
+# Porcentagem de treino
+ADVANCED_OPTIONS_HELP_PORCENTAGEM_TREINO_BUTTON_TEXT = 'Escolha a porcentagem de dados disponível para treino (padrão=75):'
+ADVANCED_OPTIONS_HELP_PORCENTAGEM_TREINO_KEY = '-ADVANCED_HELP_PORCENTAGEM-'
+
+# Tamanho do raio da matriz gaussiana
+ADVANCED_OPTIONS_GAUSSIAN_MATRIX_BUTTON_TEXT = 'Escolha o raio da matriz gaussiana (padrão=0):'
+ADVANCED_OPTIONS_GAUSSIAN_MATRIX_KEY = '-ADVANCED_GAUSSIAN_MATRIX-'
+
+# Quantidade de nitidez
+ADVANCED_OPTIONS_SHARPEN_BUTTON_TEXT = 'Escolha a quantidade de aumento do sharpen (padrão=1.4):'
+ADVANCED_OPTIONS_SHARPEN_KEY = '-ADVANCED_SHARPEN-'
+
+# Quantidade de contraste
+ADVANCED_OPTIONS_CONTRAST_TEXT_BUTTON = 'Escolha a quantidade de aumento do contraste (padrão=2.2):'
+ADVANCED_OPTIONS_CONTRAST_KEY = '-ADVANCED_CONTRAST-'
+
+# Quantidade de brilho
+ADVANCED_OPTIONS_BRIGHTNESS_TEXT_BUTTON = 'Escolha a quantidade de aumento do brilho (padrão=1.1):'
+ADVANCED_OPTIONS_BRIGHTNESS_KEY = '-ADVANCED_BRIGHTNESS-'
+
+# Preview das opções avançadas
+ADVANCED_OPTIONS_PREVIEW_TEXT_BUTTON = 'Preview das configurações'
+ADVANCED_OPTIONS_PREVIEW_KEY = '-ADVANCED_PREVIEW-'
+
+# Confirmar mudanças avançadas
+ADVANCED_OPTIONS_CONFIRM_MODIFICATIONS_TEXT_BUTTON = 'Ok!'
+ADVANCED_OPTIONS_CONFIRM_MODIFICATIONS_KEY = '-ADVANCED_APPLY_CHANGES-'
+
+### Sliders
+# Porcentagem do treinamento
+ADVANCED_OPTIONS_PORCENTAGEM_TREINAMENTO_SLIDER_KEY = '-ADVANCED_PORCENTAGEM_SLIDER_KEY-'
+
+# Tamanho da matrix gaussiana
+ADVANCED_OPTIONS_GAUSSIAN_MATRIX_SLIDER_KEY = '-ADVANCED_GAUSSIAN_MATRIX_SLIDER_KEY-'
+
+# Valores do sharpen
+ADVANCED_OPTIONS_SHARPEN_SLIDER_KEY = '-ADVANCED_SHARPEN_SLIDER_KEY-'
+
+# Valores de contraste
+ADVANCED_OPTIONS_CONTRAST_SLIDER_KEY = '-ADVANCED_CONTRAST_SLIDER_KEY-'
+
+# Valores de brilho
+ADVANCED_OPTIONS_BRIGHTNESS_SLIDER_KEY = '-ADVANCED_BRIGHTNESS_SLIDER_KEY-'
