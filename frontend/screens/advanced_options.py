@@ -34,7 +34,7 @@ class AdvancedOptions:
                 sg.Text(keys.ADVANCED_OPTIONS_N_COLORS_TEXT_BUTTON),
                 sg.Button(keys.ADVANCED_OPTIONS_GENERAL_HELP_BUTTON_TEXT, border_width=4, key=keys.ADVANCED_OPTIONS_N_COLORS_KEY),
             ],
-            [sg.Button(keys.ADVANCED_OPTIONS_PREVIEW_TEXT_BUTTON, border_width=4, key=keys.ADVANCED_OPTIONS_PREVIEW_KEY)],
+            [sg.Button(keys.ADVANCED_OPTIONS_RESET_TEXT_BUTTON, border_width=4, key=keys.ADVANCED_OPTIONS_RESET_KEY)],
             [sg.Button(keys.ADVANCED_OPTIONS_CONFIRM_MODIFICATIONS_TEXT_BUTTON, border_width=4, key=keys.ADVANCED_OPTIONS_CONFIRM_MODIFICATIONS_KEY)]
         ]
 
@@ -82,7 +82,7 @@ class AdvancedOptions:
             
             elif event == keys.ADVANCED_OPTIONS_CONFIRM_MODIFICATIONS_KEY:
                 # Aplicar efeitos                
-                modelo.set_percentage_train(values[keys.ADVANCED_OPTIONS_PORCENTAGEM_TREINAMENTO_SLIDER_KEY])
+                modelo.set_percentage_train(int(values[keys.ADVANCED_OPTIONS_PORCENTAGEM_TREINAMENTO_SLIDER_KEY]))
                 modelo.set_gaussian_radius(values[keys.ADVANCED_OPTIONS_GAUSSIAN_MATRIX_SLIDER_KEY])
                 modelo.set_sharpness_boost_strength(values[keys.ADVANCED_OPTIONS_SHARPEN_SLIDER_KEY])
                 modelo.set_contrast_boost_strength(values[keys.ADVANCED_OPTIONS_CONTRAST_SLIDER_KEY])
@@ -91,6 +91,9 @@ class AdvancedOptions:
                 
                 # Fechar a janela
                 break
+            
+            elif event == keys.ADVANCED_OPTIONS_RESET_KEY:
+                self.init_tela(modelo)
             
         self.close()
 

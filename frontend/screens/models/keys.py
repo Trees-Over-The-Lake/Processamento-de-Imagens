@@ -13,6 +13,7 @@ TREINAR_MODELO_KEY = '-TRAIN_MODEL-'
 # Prever imagem única
 PREVER_IMAGEM_BUTTON_TEXT = 'Identificar uma única imagem'
 PREVER_IMAGEM_KEY = '-PREVIEW_SINGLE_IMAGE-'
+PREVER_IMAGEM_KEY_BUTTON = '-PREVIEW_SINGLE_IMAGE_BUTTON-'
 
 # Prever imagens de teste
 PREVER_IMAGENS_BUTTON_TEXT = 'Identificar imagens de teste'
@@ -54,6 +55,9 @@ TAB_PREVIEW_IMAGE_KEY = '-TAB_PREVIEW_IMAGE-'
 TAB_IMAGE_HISTOGRAM_TEXT = 'Histograma'
 TAB_IMAGE_HISTOGRAM_KEY = '-TAB_HISTOGRAM-'
 
+# Resultado do BI-RADS
+TAB_RESULT_PREDICTION_KEY = '-TAB_PREDITCT_RESULT-'
+
 ### Keys para a tela de opções avançadas
 
 # Texto do botão de ajuda 
@@ -83,9 +87,9 @@ ADVANCED_OPTIONS_BRIGHTNESS_KEY = '-ADVANCED_BRIGHTNESS-'
 ADVANCED_OPTIONS_N_COLORS_TEXT_BUTTON = 'Escolha o número de tons de cinza da image (padrão=32):'
 ADVANCED_OPTIONS_N_COLORS_KEY = '-ADVANCED_OPTIONS_N_COLORS_KEY-'
 
-# Preview das opções avançadas
-ADVANCED_OPTIONS_PREVIEW_TEXT_BUTTON = 'Preview das configurações'
-ADVANCED_OPTIONS_PREVIEW_KEY = '-ADVANCED_PREVIEW-'
+# Voltar a configuração padrão das opções avançadas
+ADVANCED_OPTIONS_RESET_TEXT_BUTTON = 'Voltar opções para o padrão'
+ADVANCED_OPTIONS_RESET_KEY = '-ADVANCED_RESET-'
 
 # Confirmar mudanças avançadas
 ADVANCED_OPTIONS_CONFIRM_MODIFICATIONS_TEXT_BUTTON = 'Ok!'

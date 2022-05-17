@@ -1,3 +1,4 @@
+from frontend import utils
 import PySimpleGUI as sg
 
 from frontend.utils import *
@@ -27,11 +28,6 @@ class GUI:
         layout = menu.layout_tela
         layout_opcoes_avancadas: advanced_options.AdvancedOptions
         
-        # Imagens da tela
-        image_selecionada: Image
-        image_com_filtro: Image
-        histograma: Image
-        
         # Criando a janela
         window = sg.Window('Reconhecimento de Tumores', layout, resizable=False, font=('Helvetica', 16))
 
@@ -50,11 +46,19 @@ class GUI:
                 self.modelo.set_images_dir(values[menu.keys.ABRIR_PASTA_BIRADS_KEY])
                 del values[menu.keys.ABRIR_PASTA_BIRADS_BUTTON_TEXT]
 
+                # Liberar botão para treinar
+                window[menu.keys.TREINAR_MODELO_KEY].update(disabled=False)
             
             # Treinar modelo
             elif event == menu.keys.TREINAR_MODELO_KEY:
                 self.modelo.split_train_test()
                 self.modelo.train_model()
+                
+                # Liberar botões que precisam do treino
+                window[menu.keys.PREVER_IMAGEM_KEY_BUTTON].update(disabled=False)
+                window[menu.keys.PREVER_IMAGENS_KEY].update(disabled=False)
+                window[menu.keys.CORTAR_E_PREVER_IMAGEM_KEY].update(disabled=False)
+                window[menu.keys.OBTER_METRICAS_MODELO_KEY].update(disabled=False)
             
             # Prever imagem única
             elif event == menu.keys.PREVER_IMAGEM_KEY:
@@ -71,12 +75,12 @@ class GUI:
                 histgr = Image.open('./histograma.png')
                 self.img_model.apply_preview_PIL_image(histgr, window, menu.keys.TAB_IMAGE_HISTOGRAM_KEY)
                 
-                sg.popup_ok(f"Classe BI-RADS identificada: {resultado_predicao[0]}", title='Resultado da Identificação', font=('Helvetica', 16))
+                window[menu.keys.TAB_RESULT_PREDICTION_KEY].update(value=f"Classe BI-RADS identificada: {resultado_predicao[0]}")
                 
             
             # Prever múltiplas imagens
             elif event == menu.keys.PREVER_IMAGENS_KEY:
-                print('PREVER_IMAGENS_KEY')
+                self.modelo.predict_test_images()
             
             # Cortar e prever imagem
             elif event == menu.keys.CORTAR_E_PREVER_IMAGEM_KEY:
@@ -103,11 +107,13 @@ class GUI:
             
             # Opções avançadas
             elif event == menu.keys.AJUDA_KEY:
-                print('AJUDA_KEY')
+                texto_de_ajuda = utils.read_file('./assets/texts/help.txt')
+                sg.popup_ok(texto_de_ajuda, title='Ajuda', font=('Helvetica', 16))
             
             # Créditos da aplicação
             elif event == menu.keys.CREDITOS_KEY:
-                print('CREDITOS_KEY')
+                texto_de_creditos = utils.read_file('./assets/texts/creditos.txt')
+                sg.popup_ok(texto_de_creditos, title='Créditos', font=('Helvetica', 16))
             
 
         # Finalizar aplicação e fechar a janela
