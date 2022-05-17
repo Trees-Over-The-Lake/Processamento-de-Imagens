@@ -58,7 +58,6 @@ class GUI:
                 window[menu.keys.PREVER_IMAGEM_KEY_BUTTON].update(disabled=False)
                 window[menu.keys.PREVER_IMAGENS_KEY].update(disabled=False)
                 window[menu.keys.CORTAR_E_PREVER_IMAGEM_KEY].update(disabled=False)
-                window[menu.keys.OBTER_METRICAS_MODELO_KEY].update(disabled=False)
             
             # Prever imagem única
             elif event == menu.keys.PREVER_IMAGEM_KEY:
@@ -81,6 +80,7 @@ class GUI:
             # Prever múltiplas imagens
             elif event == menu.keys.PREVER_IMAGENS_KEY:
                 self.modelo.predict_test_images()
+                window[menu.keys.OBTER_METRICAS_MODELO_KEY].update(disabled=False)
             
             # Cortar e prever imagem
             elif event == menu.keys.CORTAR_E_PREVER_IMAGEM_KEY:
@@ -88,12 +88,16 @@ class GUI:
             
             # Obter métricas de classificação do modelo
             elif event == menu.keys.OBTER_METRICAS_MODELO_KEY:
-                metricas = self.modelo.get_runtime_metrics()
+                runtime_metricas = self.modelo.get_runtime_metrics()
                             
-                texto_final = ''
+                texto_final = 'Métricas do tempo de execução:\n\n'
                 # Formatar o print                
-                for key in metricas:
-                    texto_final += f"{key}: {metricas[key]}\n\n"
+                for key in runtime_metricas:
+                    texto_final += f"{key}: {runtime_metricas[key]}\n"
+                
+                texto_final += '\nMétricas do modelo:\n\n'
+                accuracy, especificidade = self.modelo.get_prediction_metrics()
+                texto_final += f"Acurácia: {accuracy}\nEspecificidade: {especificidade}"
                 
                 sg.popup_ok(texto_final, title='Métricas de Avaliação do Modelo', font=('Helvetica', 16))
             

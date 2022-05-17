@@ -283,6 +283,9 @@ class ImageClassifier:
         tmp_train_set = []
         tmp_test_set  = []
 
+        self.__answers_test  = np.empty(0, dtype=np.int32)
+        self.__answers_train = np.empty(0, dtype=np.int32)
+
         # Essas são as 4 classes BIRADS
         density_classes = ["1", "2", "3", "4"]
 
@@ -313,7 +316,7 @@ class ImageClassifier:
         # Fim da separação
         end = time.perf_counter()
 
-        self.set_runtime_metric("Split treino e teste", end - start)
+        self.set_runtime_metric("Separação das imagens de treino e teste", end - start)
 
         # Transformando de volta para um array numpy
         self.__images_train = np.asarray(tmp_train_set)
@@ -329,7 +332,7 @@ class ImageClassifier:
         self.__model.fit(self.get_images_train(), self.get_answers_train())
         end   = time.perf_counter()
 
-        self.set_runtime_metric("Treino", end-start)
+        self.set_runtime_metric("Etapa de treinamento do modelo", end-start)
 
 
     '''
@@ -341,7 +344,7 @@ class ImageClassifier:
         self.__predictions = self.__model.predict(self.get_images_test())
         end   = time.perf_counter()
 
-        self.set_runtime_metric("Previsão imagens de teste", end - start)
+        self.set_runtime_metric("Identificação das imagens de teste", end - start)
 
 
     '''
@@ -356,7 +359,7 @@ class ImageClassifier:
         birads_class = self.__model.predict([descriptors])
         
         end   = time.perf_counter()
-        self.set_runtime_metric("Previsão imagem única", end - start)
+        self.set_runtime_metric("Identificação de uma única imagem", end - start)
 
         return birads_class
 
@@ -379,7 +382,7 @@ class ImageClassifier:
 
         end = time.perf_counter()
 
-        self.set_runtime_metric("Geração de Histograma", end - start)
+        self.set_runtime_metric("Geração do Histograma", end - start)
 
 
     '''
@@ -395,7 +398,7 @@ class ImageClassifier:
 
         end = time.perf_counter()
 
-        self.set_runtime_metric("Preview da imagem", end - start)
+        self.set_runtime_metric("Aplicação dos efeitos na imagem", end - start)
         return image
 
 

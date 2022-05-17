@@ -44,7 +44,7 @@ class AdvancedOptions:
             [sg.Slider(range=([0.0, 4.0]), resolution=0.1, size=(20,15), orientation='horizontal', key=keys.ADVANCED_OPTIONS_SHARPEN_SLIDER_KEY)],
             [sg.Slider(range=([0.0, 4.0]), resolution=0.1, size=(20,15), orientation='horizontal', key=keys.ADVANCED_OPTIONS_CONTRAST_SLIDER_KEY)],
             [sg.Slider(range=([0.0, 4.0]), resolution=0.1, size=(20,15), orientation='horizontal', key=keys.ADVANCED_OPTIONS_BRIGHTNESS_SLIDER_KEY)],
-            [sg.Slider(range=(1,32), size=(20,15), orientation='horizontal', key=keys.ADVANCED_OPTIONS_N_COLORS_SLIDER_KEY)]
+            [sg.Slider(range=(2,32), size=(20,15), orientation='horizontal', key=keys.ADVANCED_OPTIONS_N_COLORS_SLIDER_KEY)]
         ]
 
         layout_advanced_options = [
@@ -106,5 +106,35 @@ class AdvancedOptions:
                 modelo_default = classifier.ImageClassifier()
                 self.reset_tela_default_values(modelo_default)
                 del modelo_default
+                
+            elif event == keys.ADVANCED_OPTIONS_HELP_PORCENTAGEM_TREINO_KEY:
+                ajuda = "Escolha a porcentagem das imagens que serão usadas para treinar o modelo, o resto será usado no treino"
+                
+                sg.popup_ok(ajuda, title='Ajuda', font=('Helvetica', 16))
+            
+            elif event == keys.ADVANCED_OPTIONS_GAUSSIAN_MATRIX_KEY:
+                ajuda = "Escolha qual o raio do filtro gaussiano que será aplicado sobre a imagem"
+                
+                sg.popup_ok(ajuda, title='Ajuda', font=('Helvetica', 16))
+                
+            elif event == keys.ADVANCED_OPTIONS_SHARPEN_KEY:
+                ajuda = "Escolha quanto será realçado as bordas"
+                
+                sg.popup_ok(ajuda, title='Ajuda', font=('Helvetica', 16))
+            
+            elif event == keys.ADVANCED_OPTIONS_CONTRAST_KEY:
+                ajuda = "Escolha o quanto serão realçadas as diferenças entre as partes mais escuras e mais claras da imagem"
+                
+                sg.popup_ok(ajuda, title='Ajuda', font=('Helvetica', 16))
+                
+            elif event == keys.ADVANCED_OPTIONS_BRIGHTNESS_KEY:
+                ajuda = "Escolha o quanto serão realçados tons de cinza mais claros"
+                
+                sg.popup_ok(ajuda, title='Ajuda', font=('Helvetica', 16))
+            
+            elif event == keys.ADVANCED_OPTIONS_N_COLORS_KEY:
+                ajuda = "Escolha quantos tons de cinza terão na imagem final"
+                
+                sg.popup_ok(ajuda, title='Ajuda', font=('Helvetica', 16))
             
         self.close()
