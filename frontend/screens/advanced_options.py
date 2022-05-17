@@ -67,6 +67,16 @@ class AdvancedOptions:
         self.__tela[keys.ADVANCED_OPTIONS_BRIGHTNESS_SLIDER_KEY].update(value=modelo.get_brightness_boost_strength())
         self.__tela[keys.ADVANCED_OPTIONS_N_COLORS_SLIDER_KEY].update(value=modelo.get_n_colors())
 
+    # Reset os valores da tela para seus valores padrão
+    def reset_tela_default_values(self, modelo: classifier.ImageClassifier):
+        # Aplicando valores padrão do modelo na tela
+        self.__tela[keys.ADVANCED_OPTIONS_PORCENTAGEM_TREINAMENTO_SLIDER_KEY].update(value=modelo.get_percentage_train())
+        self.__tela[keys.ADVANCED_OPTIONS_GAUSSIAN_MATRIX_SLIDER_KEY].update(value=modelo.get_gaussian_radius())
+        self.__tela[keys.ADVANCED_OPTIONS_SHARPEN_SLIDER_KEY].update(value=modelo.get_sharpness_boost_strength())
+        self.__tela[keys.ADVANCED_OPTIONS_CONTRAST_SLIDER_KEY].update(value=modelo.get_contrast_boost_strength())
+        self.__tela[keys.ADVANCED_OPTIONS_BRIGHTNESS_SLIDER_KEY].update(value=modelo.get_brightness_boost_strength())
+        self.__tela[keys.ADVANCED_OPTIONS_N_COLORS_SLIDER_KEY].update(value=modelo.get_n_colors())
+
     def construir_tela_opcoes_avancadas(self, modelo: classifier.ImageClassifier):
         self.__tela = sg.Window('Opções avançadas', self._build_layout(), resizable=False, font=('Helvetica', 16), finalize=True)
         
@@ -93,42 +103,8 @@ class AdvancedOptions:
                 break
             
             elif event == keys.ADVANCED_OPTIONS_RESET_KEY:
-                self.init_tela(modelo)
+                modelo_default = classifier.ImageClassifier()
+                self.reset_tela_default_values(modelo_default)
+                del modelo_default
             
         self.close()
-
-    # while True:
-
-    #     event, values = options_window.read()
-
-    #     porcentagem       = values['-PORCENTAGEM_TREINAMENTO-']
-    #     gaussian_radius   = values['-RAIO_MATRIX_GAUSSIANA-']
-    #     sharpen_factor    = values['-SHARPEN_BOOST-']
-    #     contrast_factor   = values['-CONTRAST_BOOST-']
-    #     brightness_factor = values['-BRIGHTNESS_BOOST-']
-    #     ncolors           = values['']
-
-    #     if event == '__help_porcentagem':
-    #         print("ABRIR HELP_SHARPEN")
-
-    #     if event == '__ok':
-            
-
-    #         modelo.set_percentage_train(porcentagem)
-    #         modelo.set_gaussian_radius(gaussian_radius)
-    #         modelo.set_sharpness_boost_strength(sharpen_factor)
-    #         modelo.set_contrast_boost_strength(contrast_factor)
-    #         modelo.set_brightness_boost_strength(brightness_factor)
-            
-    #         options_window.close()
-    #         break
-
-    #     elif event == '__preview':
-
-    #         modelo.set_percentage_train(porcentagem)
-    #         modelo.set_gaussian_radius(gaussian_radius)
-    #         modelo.set_sharpness_boost_strength(sharpen_factor)
-    #         modelo.set_contrast_boost_strength(contrast_factor)
-    #         modelo.set_brightness_boost_strength(brightness_factor)
-
-    #         modelo.preview_single_image(DEFAULT_IMG)
