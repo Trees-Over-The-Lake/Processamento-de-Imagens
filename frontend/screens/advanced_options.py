@@ -30,6 +30,10 @@ class AdvancedOptions:
                 sg.Text(keys.ADVANCED_OPTIONS_BRIGHTNESS_TEXT_BUTTON),
                 sg.Button(keys.ADVANCED_OPTIONS_GENERAL_HELP_BUTTON_TEXT, border_width=4, key=keys.ADVANCED_OPTIONS_BRIGHTNESS_KEY),
             ],
+            [
+                sg.Text(keys.ADVANCED_OPTIONS_N_COLORS_TEXT_BUTTON),
+                sg.Button(keys.ADVANCED_OPTIONS_GENERAL_HELP_BUTTON_TEXT, border_width=4, key=keys.ADVANCED_OPTIONS_N_COLORS_KEY),
+            ],
             [sg.Button(keys.ADVANCED_OPTIONS_PREVIEW_TEXT_BUTTON, border_width=4, key=keys.ADVANCED_OPTIONS_PREVIEW_KEY)],
             [sg.Button(keys.ADVANCED_OPTIONS_CONFIRM_MODIFICATIONS_TEXT_BUTTON, border_width=4, key=keys.ADVANCED_OPTIONS_CONFIRM_MODIFICATIONS_KEY)]
         ]
@@ -39,7 +43,8 @@ class AdvancedOptions:
             [sg.Slider(range=(0,4), size=(20,15), orientation='horizontal', key=keys.ADVANCED_OPTIONS_GAUSSIAN_MATRIX_SLIDER_KEY)],
             [sg.Slider(range=([0.0, 4.0]), resolution=0.1, size=(20,15), orientation='horizontal', key=keys.ADVANCED_OPTIONS_SHARPEN_SLIDER_KEY)],
             [sg.Slider(range=([0.0, 4.0]), resolution=0.1, size=(20,15), orientation='horizontal', key=keys.ADVANCED_OPTIONS_CONTRAST_SLIDER_KEY)],
-            [sg.Slider(range=([0.0, 4.0]), resolution=0.1, size=(20,15), orientation='horizontal', key=keys.ADVANCED_OPTIONS_BRIGHTNESS_SLIDER_KEY)]
+            [sg.Slider(range=([0.0, 4.0]), resolution=0.1, size=(20,15), orientation='horizontal', key=keys.ADVANCED_OPTIONS_BRIGHTNESS_SLIDER_KEY)],
+            [sg.Slider(range=(1,32), size=(20,15), orientation='horizontal', key=keys.ADVANCED_OPTIONS_N_COLORS_SLIDER_KEY)]
         ]
 
         layout_advanced_options = [
@@ -60,6 +65,7 @@ class AdvancedOptions:
         self.__tela[keys.ADVANCED_OPTIONS_SHARPEN_SLIDER_KEY].update(value=modelo.get_sharpness_boost_strength())
         self.__tela[keys.ADVANCED_OPTIONS_CONTRAST_SLIDER_KEY].update(value=modelo.get_contrast_boost_strength())
         self.__tela[keys.ADVANCED_OPTIONS_BRIGHTNESS_SLIDER_KEY].update(value=modelo.get_brightness_boost_strength())
+        self.__tela[keys.ADVANCED_OPTIONS_N_COLORS_SLIDER_KEY].update(value=modelo.get_n_colors())
 
     def construir_tela_opcoes_avancadas(self, modelo: classifier.ImageClassifier):
         self.__tela = sg.Window('Opções avançadas', self._build_layout(), resizable=False, font=('Helvetica', 16), finalize=True)
@@ -81,6 +87,9 @@ class AdvancedOptions:
                 modelo.set_sharpness_boost_strength(values[keys.ADVANCED_OPTIONS_SHARPEN_SLIDER_KEY])
                 modelo.set_contrast_boost_strength(values[keys.ADVANCED_OPTIONS_CONTRAST_SLIDER_KEY])
                 modelo.set_brightness_boost_strength(values[keys.ADVANCED_OPTIONS_BRIGHTNESS_SLIDER_KEY])
+                modelo.set_n_colors(values[keys.ADVANCED_OPTIONS_N_COLORS_SLIDER_KEY])
+                
+                # Fechar a janela
                 break
             
         self.close()
