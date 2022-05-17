@@ -29,6 +29,7 @@ class GUI:
         # Eventos ocorridos
         while self.loop:
             event, values = window.read()
+            print(values)
 
             # Sair da aplicação
             if event == sg.WIN_CLOSED: 
@@ -39,10 +40,13 @@ class GUI:
             elif event == menu.keys.ABRIR_PASTA_BIRADS_KEY:
                 # Validação da entrada
                 print('entrei')
+                self.modelo.set_images_dir(values[menu.keys.ABRIR_PASTA_BIRADS_KEY])
 
             
             # Treinar modelo
             elif event == menu.keys.TREINAR_MODELO_KEY:
+                self.modelo.set_images_dir(values[menu.keys.ABRIR_PASTA_BIRADS_KEY])
+                self.modelo.split_train_test()
                 self.modelo.train_model()
             
             # Prever imagem única

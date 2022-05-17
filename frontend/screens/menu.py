@@ -11,7 +11,8 @@ window_config = config.ConfigModel()
 
 # Botões presentes à esquerda da tela
 layout_esquerda = [
-    [sg.Button(keys.ABRIR_PASTA_BIRADS_BUTTON_TEXT, key=keys.ABRIR_PASTA_BIRADS_KEY, 
+    [sg.Input(key=keys.ABRIR_PASTA_BIRADS_KEY, visible=False, enable_events=True)],
+    [sg.Button(keys.ABRIR_PASTA_BIRADS_BUTTON_TEXT, key=keys.ABRIR_PASTA_BIRADS_KEY, target=(-1, 0),
                size=window_config.get_button_size(), border_width=4, button_type=sg.BUTTON_TYPE_BROWSE_FOLDER)],
     [sg.Button(keys.TREINAR_MODELO_BUTTON_TEXT, key=keys.TREINAR_MODELO_KEY, size=window_config.get_button_size(), border_width=4)],
     [sg.Button(keys.PREVER_IMAGEM_BUTTON_TEXT, key=keys.PREVER_IMAGEM_KEY, size=window_config.get_button_size(), border_width=4)],
