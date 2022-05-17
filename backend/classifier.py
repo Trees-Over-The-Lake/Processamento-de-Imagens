@@ -372,11 +372,9 @@ class ImageClassifier:
         image = Image.open(f"{filepath}")
         image = image.quantize(self.get_n_colors())
 
-        histogram = image.histogram()
-
-        plt.hist(histogram, color=['gray'])
-        plt.xlabel("Número de ocorrências")
-        plt.ylabel("Tom de cinza")
+        plt.hist(np.asarray(image).ravel(), 256, [0,32], color=['gray'], histtype='stepfilled')
+        plt.ylabel("Número de ocorrências")
+        plt.xlabel("Tom de cinza")
         plt.savefig('./histograma.png')
 
         end = time.perf_counter()
