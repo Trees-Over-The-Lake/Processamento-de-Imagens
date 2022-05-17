@@ -82,6 +82,7 @@ def options_window(modelo):
         sharpen_factor    = values['-SHARPEN_BOOST-']
         contrast_factor   = values['-CONTRAST_BOOST-']
         brightness_factor = values['-BRIGHTNESS_BOOST-']
+        ncolors           = values['']
 
         if event == '__help_porcentagem':
             print("ABRIR HELP_SHARPEN")

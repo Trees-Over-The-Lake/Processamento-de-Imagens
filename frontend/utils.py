@@ -5,3 +5,9 @@ from matplotlib import pyplot as plt
 def showImage(image_path):
     io.imshow(image_path)
     plt.show()
+    
+def read_file(filepath):
+    with open(filepath) as f:
+        text = f.read()
+    
+    return text

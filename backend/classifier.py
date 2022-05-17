@@ -1,4 +1,4 @@
-import os, time, itertools
+import os, time
 
 import sklearn.metrics
 from skimage.feature import graycomatrix, graycoprops
@@ -17,7 +17,7 @@ from PIL import Image, ImageFilter, ImageEnhance
 
 class ImageClassifier:
     # Modelo para previsões
-    __model: svm.LinearSVC()
+    __model: svm.SVC()
     
     # Kernel do modelo
     __model_kernel: str
@@ -292,7 +292,7 @@ class ImageClassifier:
         for density_class in density_classes:
             path_images = [f for f in os.listdir(f"{self.get_images_dir()}/{density_class}") if f.endswith(tuple(self.get_supported_img_extensions()))]
             
-            tmp_train, tmp_test = train_test_split(path_images, train_size=self.get_percentage_train(), shuffle=False)
+            tmp_train, tmp_test = train_test_split(path_images, train_size=self.get_percentage_train(), shuffle=True)
 
             # Para cada imagem no conjunto de treino, extrair os descritores de textura abaixo e concatená-los
             # ao conjunto de treino

@@ -1,10 +1,10 @@
-import concurrent.futures
 import PySimpleGUI as sg
+import os
 
-from frontend.image import *
+from frontend.utils import *
 
-from frontend import explanation, options_window
 from backend import classifier
+from frontend.screens import menu
 
 # Class to define all functions to work the frontend
 class GUI:
@@ -16,99 +16,62 @@ class GUI:
 
     # Draw the GUI and hold it, until the user asks to exit
     def drawGUI(self):
-        self.initial_screen()
         self.main_screen()
-
-
-    def initial_screen(self):
-        # Elementos da tela de predição
-
-        topbar = [
-                    [sg.Text('Reconhecimento Automático de Densidade da Mama',font=("Helvetica 17 bold"), size=(None, 3))],
-                    [sg.Image(source="frontend/assets/logo-puc-minas.png")]
-        ]
-        
-        centered_elements = [
-                    [
-                        sg.Button('Como funciona?', border_width=4, key="__help"), 
-                        sg.Button('Opções avançadas', border_width=4, key="__options"),
-                        sg.Button('Créditos', border_width=4, key="__creditos")
-                    ],
-                    [sg.Button('Iniciar', border_width=4, key="__start")],
-        ]
-
-        layout = [
-                topbar,
-                [sg.VPush()],
-                [sg.Push(), sg.Column(centered_elements, element_justification='c'), sg.Push()],
-                [sg.VPush()]
-        ]
-
-        window = sg.Window('Predição das Mamografias', layout, resizable=False, font=('Helvetica', 16))
-        
-        while self.loop:
-            event, values = window.read()
-            
-            if event == sg.WIN_CLOSED: 
-                self.loop = False
-                break
-                
-            elif event == '__start':
-                window.close()
-                break
-
-            elif event == '__help':
-                explanation.draw_help_window()
-
-            elif event == '__creditos':
-                explanation.draw_credits_window()
-            
-            elif event == '__options':
-                sg.popup_ok_cancel(
-                    'Tem certeza que deseja configurar as opções avançadas? Isto pode afetar o desempenho do modelo!', 
-                    title='Aviso', 
-                    font=('Helvetica', 16)
-                )
-
-                options_window.options_window(self.modelo)
-                
-
 
     # Drawing the drawTrainGUI
     def main_screen(self):
-        # All the stuff inside your window.
-        layout = [  
-                    [sg.Text('\tAplicativo de detecção de tumores em mamografias')],
-                    [sg.Text('Escolha a porcentagem de dados disponível para treino: '), 
-                    sg.Slider(range=(1,99), default_value=75, size=(20,15),
-                    orientation='horizontal', key='-PORCENTAGEM_TREINAMENTO-')],
-                    [sg.Text('Escolha quantos tons de cinza para o processamento: '), 
-                    sg.Slider(range=(1,32), default_value=32, size=(20,15), key='-GREY_COLORS-', orientation='horizontal')],
-                    [sg.Text('Escolha o arquivo que deseja abrir:')],
-                    [sg.InputText(key='-FILE_PATH-'), sg.FolderBrowse(initial_folder=self.current_working_dir, key='-IMAGES_FOLDER-')],
-                    [sg.Button('Treinar')]
-                ]
+        # Layout da tela para o usuário
+        layout = menu.layout_tela
+        
+        # Criando a janela
+        window = sg.Window('Reconhecimento de Tumores', layout, resizable=False, font=('Helvetica', 16))
 
-        # Create the Window
-        window = sg.Window('Treinamento das mamografias ', layout, resizable=False, font=('Helvetica', 16))
-
-        # Event Loop to process "events" and get the "values" of the inputs
+        # Eventos ocorridos
         while self.loop:
             event, values = window.read()
 
+            # Sair da aplicação
             if event == sg.WIN_CLOSED: 
                 self.loop = False
                 break
-            elif event == 'Treinar':
-                image_folder = values['-IMAGES_FOLDER-']
-                grey_colors  = int(values['-GREY_COLORS-'])
-                train_size   = int(values['-PORCENTAGEM_TREINAMENTO-'])
-                
-                print("Pasta carregada:", image_folder)
-                
-                accuracy, especificidade = classifier.runPrediction(train_size, image_folder, grey_colors)
-                sg.Popup(f"Acurácia: {accuracy}", image='./metricas.png', title='Resultado Treinamento', font=('Helvetica', 16))
-                    
-                break
+            
+            # Selecionar os arquivos do disco
+            elif event == menu.keys.ABRIR_PASTA_BIRADS_KEY:
+                # Validação da entrada
+                print('entrei')
 
+            
+            # Treinar modelo
+            elif event == menu.keys.TREINAR_MODELO_KEY:
+                self.modelo.train_model()
+            
+            # Prever imagem única
+            elif event == menu.keys.PREVER_IMAGEM_KEY:
+                print('PREVER_IMAGEM_KEY')
+            
+            # Prever múltiplas imagens
+            elif event == menu.keys.PREVER_IMAGENS_KEY:
+                print('PREVER_IMAGENS_KEY')
+            
+            # Cortar e prever imagem
+            elif event == menu.keys.CORTAR_E_PREVER_IMAGEM_KEY:
+                print('CORTAR_E_PREVER_IMAGEM_KEY')
+            
+            # Obter métricas de classificação do modelo
+            elif event == menu.keys.OBTER_METRICAS_MODELO_KEY:
+                print('OBTER_METRICAS_MODELO_KEY')
+            
+            # Abrir opções avançadas
+            elif event == menu.keys.OPCOES_AVANCADAS_KEY:
+                print('OPCOES_AVANCADAS_KEY')
+            
+            # Opções avançadas
+            elif event == menu.keys.AJUDA_KEY:
+                print('AJUDA_KEY')
+            
+            # Creditos da aplicação
+            elif event == menu.keys.CREDITOS_KEY:
+                print('CREDITOS_KEY')
+
+        # Finalizar aplicação e fechar a janela
         window.close()
