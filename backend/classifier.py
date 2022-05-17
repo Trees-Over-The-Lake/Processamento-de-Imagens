@@ -245,7 +245,7 @@ class ImageClassifier:
     def process_img(self, filepath: str):
         start = time.perf_counter()
 
-        image =  Image.open(f"{self.get_images_dir()}/{filepath}")
+        image =  Image.open(f"{filepath}")
         image = self.pre_process_img(image)
 
         # Gerando matriz de co-ocorrência

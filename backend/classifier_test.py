@@ -1,4 +1,5 @@
 from classifier import ImageClassifier
+import os
 
 classifier = ImageClassifier()
 
@@ -35,7 +36,7 @@ classifier.set_brightness_boost_strength(1.1)
 classifier.split_train_test()
 
 classifier.train_model()
-classifier.predict_single_image("1/p_d_left_cc(12).png")
+classifier.predict_single_image(f"{os.getcwd()}/../Imagens/1/p_d_left_cc(12).png")
 #classifier.preview_singe_image("1/p_d_left_cc(12).png")
 classifier.predict_test_images()
 print(classifier.get_prediction_metrics())
