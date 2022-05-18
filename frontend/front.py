@@ -57,7 +57,6 @@ class GUI:
                 # Liberar botões que precisam do treino
                 window[menu.keys.PREVER_IMAGEM_KEY_BUTTON].update(disabled=False)
                 window[menu.keys.PREVER_IMAGENS_KEY].update(disabled=False)
-                window[menu.keys.CORTAR_E_PREVER_IMAGEM_KEY].update(disabled=False)
             
             # Prever imagem única
             elif event == menu.keys.PREVER_IMAGEM_KEY:
@@ -82,9 +81,6 @@ class GUI:
                 self.modelo.predict_test_images()
                 window[menu.keys.OBTER_METRICAS_MODELO_KEY].update(disabled=False)
             
-            # Cortar e prever imagem
-            elif event == menu.keys.CORTAR_E_PREVER_IMAGEM_KEY:
-                print('CORTAR_E_PREVER_IMAGEM_KEY')
             
             # Obter métricas de classificação do modelo
             elif event == menu.keys.OBTER_METRICAS_MODELO_KEY:
@@ -108,6 +104,10 @@ class GUI:
                 if acessar_opcoes == 'OK':
                     layout_opcoes_avancadas = advanced_options.AdvancedOptions()
                     layout_opcoes_avancadas.construir_tela_opcoes_avancadas(self.modelo)
+                    
+                    # Travar botões que precisam do treino
+                    window[menu.keys.PREVER_IMAGEM_KEY_BUTTON].update(disabled=True)
+                    window[menu.keys.PREVER_IMAGENS_KEY].update(disabled=True)
             
             # Opções avançadas
             elif event == menu.keys.AJUDA_KEY:

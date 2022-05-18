@@ -17,7 +17,6 @@ layout_esquerda = [
     [sg.Input(key=keys.PREVER_IMAGEM_KEY, visible=False, enable_events=True)],
     [sg.Button(keys.PREVER_IMAGEM_BUTTON_TEXT, key=keys.PREVER_IMAGEM_KEY_BUTTON, target=(-1, 0), size=window_config.get_button_size(), border_width=4, disabled=True, button_type=sg.BUTTON_TYPE_BROWSE_FILE)],
     [sg.Button(keys.PREVER_IMAGENS_BUTTON_TEXT, key=keys.PREVER_IMAGENS_KEY, size=window_config.get_button_size(), border_width=4, disabled=True)],
-    [sg.Button(keys.CORTAR_E_PREVER_IMAGEM_BUTTON_TEXT, key=keys.CORTAR_E_PREVER_IMAGEM_KEY, size=window_config.get_button_size(), border_width=4, disabled=True)],
     [sg.Button(keys.OBTER_METRICAS_MODELO_BUTTON_TEXT, key=keys.OBTER_METRICAS_MODELO_KEY, size=window_config.get_button_size(), border_width=4, disabled=True)],
     [sg.Button(keys.OPCOES_AVANCADAS_BUTTON_TEXT, key=keys.OPCOES_AVANCADAS_KEY, size=window_config.get_button_size(), border_width=4)],
     [sg.Button(keys.AJUDA_BUTTON_TEXT, key=keys.AJUDA_KEY, size=window_config.get_button_size(), border_width=4)],
@@ -50,5 +49,5 @@ layout_direita = [
 
 # Layout da tela final
 layout_tela = [
-    [sg.Column(layout_esquerda), sg.VSeparator(), sg.vtop(sg.Column(layout_direita))],
+    [sg.vtop(sg.Column(layout_esquerda)), sg.VSeparator(), sg.vtop(sg.Column(layout_direita))],
 ]
