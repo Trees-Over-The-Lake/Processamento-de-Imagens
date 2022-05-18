@@ -8,7 +8,7 @@ from frontend.screens import menu
 from frontend.screens import advanced_options
 
 from frontend.screens.models import images
-from PIL import Image
+from PIL import Image, ImageTk
 
 # Class to define all functions to work the frontend
 class GUI:    
@@ -95,7 +95,8 @@ class GUI:
                 accuracy, especificidade = self.modelo.get_prediction_metrics()
                 texto_final += f"Acurácia: {accuracy}\nEspecificidade: {especificidade}"
                 
-                sg.popup_ok(texto_final, title='Métricas de Avaliação do Modelo', font=('Helvetica', 16))
+                # Imagem da matriz de confusão
+                sg.popup_ok(texto_final, image='./matriz-confusao.png', title='Métricas de Avaliação do Modelo', font=('Helvetica', 16))
             
             # Abrir opções avançadas
             elif event == menu.keys.OPCOES_AVANCADAS_KEY:
@@ -119,7 +120,6 @@ class GUI:
                 texto_de_creditos = utils.read_file('./assets/texts/creditos.txt')
                 sg.popup_ok(texto_de_creditos, title='Créditos', font=('Helvetica', 16))
             
-
         # Finalizar aplicação e fechar a janela
         window.close()
         

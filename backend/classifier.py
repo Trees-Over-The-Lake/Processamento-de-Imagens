@@ -413,28 +413,29 @@ class ImageClassifier:
         c_matrix = sklearn.metrics.confusion_matrix(self.get_answers_test(), self.get_predictions())
         especificidade = (100 - accuracy)/300
 
-        plt.matshow(c_matrix, cmap=plt.cm.BuGn)
+        mat = plt
+        mat.matshow(c_matrix, cmap=plt.cm.BuGn)
 
         # Mudando o colormap para facilitar a visualização. E também pra ficar mais legal :)
-        plt.title("Matriz de Confusão", y=1, loc="center", pad=40, fontsize=16)
-        plt.colorbar()
+        mat.title("Matriz de Confusão", y=1, loc="center", pad=40, fontsize=16)
+        mat.colorbar()
 
         for (i, j), z in np.ndenumerate(c_matrix):
-            plt.text(j, i, '{:0.0f}'.format(z), ha='center', va='center', 
+            mat.text(j, i, '{:0.0f}'.format(z), ha='center', va='center', 
                 bbox=dict(boxstyle='round', facecolor='white', edgecolor='0.3'))
         
         # Cada tick representa uma das classes BIRADS. Tem um 0
         # pq o matplotlib precisa de um ponto para começar o desenho,
         # no caso o ponto (0,0) precisa existir
-        ax = plt.gca()
+        ax = mat.gca()
         ax.set_xticklabels(("0","1","2","3","4"))
         ax.set_yticklabels(("0","1","2","3","4"))
 
         # Definindo os labels
-        plt.ylabel("Classe correta", labelpad=15, fontsize=13)
-        plt.xlabel("Classe estimada", labelpad=20, fontsize=13)
+        mat.ylabel("Classe correta", labelpad=15, fontsize=13)
+        mat.xlabel("Classe estimada", labelpad=20, fontsize=13)
 
-        plt.savefig(f"./matriz-confusao.png")
+        mat.savefig(f"./matriz-confusao.png")
 
         end = time.perf_counter()
 
